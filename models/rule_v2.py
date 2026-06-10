@@ -1,6 +1,7 @@
 """Model B: enhanced rule-based analysis with safer phrasing."""
 
 from backend.analyzer import analyze_document
+from rag_retriever import enrich_result_with_domain_knowledge
 
 
 SAFETY_PHRASES = {
@@ -73,7 +74,7 @@ def _enhance_cards(result: dict, text: str) -> list:
     return cards
 
 
-def analyze_with_rule_v2(text: str) -> dict:
+def analyze_with_rule_v2(text: str, use_rag: bool = True) -> dict:
     """Create a safer, enhanced variant of the current analyzer output."""
     result = analyze_document(text)
     result["model"] = "rule_v2"
@@ -85,4 +86,8 @@ def analyze_with_rule_v2(text: str) -> dict:
         checklist.insert(0, "민감한 문서는 전문가에게 문의해 확인하세요.")
 
     result["checklist"] = checklist
+
+    if use_rag:
+        result = enrich_result_with_domain_knowledge(result)
+
     return result
