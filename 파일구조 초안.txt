@@ -1,0 +1,27 @@
+5sec-doc-check/
+├── README.md
+├── backend/
+│   ├── main.py
+│   ├── schemas.py
+│   ├── analyzer.py
+│   ├── classifier.py
+│   ├── extractor.py
+│   └── requirements.txt
+├── frontend/
+│   ├── package.json
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── api/
+│   │   │   └── analyze.js
+│   │   ├── components/
+│   │   │   ├── DocumentInput.jsx
+│   │   │   ├── ResultCard.jsx
+│   │   │   └── Checklist.jsx
+│   │   └── styles/
+│   │       └── index.css
+├── docs/
+│   ├── problem.md
+│   ├── vision.md
+│   └── prd.md
+└── data/
+    └── sample_documents.csv

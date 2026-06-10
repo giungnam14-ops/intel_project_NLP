@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "frontend-install",
+			"type": "shell",
+			"command": "npm install",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "frontend-install",
+			"type": "shell",
+			"command": "set PATH=C:\\Program Files\\nodejs;%PATH% && npm install",
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
