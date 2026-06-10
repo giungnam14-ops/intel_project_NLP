@@ -1,6 +1,6 @@
 """Pydantic models prepared for FastAPI integration."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AnalyzeRequest(BaseModel):
@@ -17,9 +17,15 @@ class AnalyzeCard(BaseModel):
 
 
 class AnalyzeResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     document_type: str
     document_type_label: str
     risk_level: str
     summary: str
     cards: list[AnalyzeCard]
     checklist: list[str]
+    warnings: list[str] = []
+    guardrail_applied: bool = False
+    blocked: bool = False
+    blocked_reason: str | None = None

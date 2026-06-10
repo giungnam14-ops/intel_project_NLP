@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.analyzer import analyze_document
 from backend.schemas import AnalyzeRequest, AnalyzeResponse, AnalyzeCard
+from guardrails import apply_guardrails
 
 app = FastAPI(title="5초 문서체크 API", version="1.0.0")
 
@@ -27,7 +28,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     if not request.text or not request.text.strip():
         raise HTTPException(status_code=400, detail="text is required")
 
-    result = analyze_document(request.text)
+    result = apply_guardrails(request.text, analyze_document)
 
     return AnalyzeResponse(
         document_type=result["document_type"],
@@ -36,4 +37,8 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         summary=result["summary"],
         cards=[AnalyzeCard(**card) for card in result.get("cards", [])],
         checklist=result.get("checklist", []),
+        warnings=result.get("warnings", []),
+        guardrail_applied=result.get("guardrail_applied", True),
+        blocked=result.get("blocked", False),
+        blocked_reason=result.get("blocked_reason", None),
     )
