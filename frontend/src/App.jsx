@@ -68,11 +68,11 @@ function App() {
   return (
     <main className="app-shell">
       <section className="hero-card panel">
-        <p className="eyebrow">AI 문서 핵심 분석</p>
-        <h1>놓치마크</h1>
-        <p className="lead">긴 문서 속 놓치면 안 되는 핵심 문장을 AI가 표시합니다.</p>
+        <p className="eyebrow">AI 문서 요점 체크</p>
+        <h1>문요</h1>
+        <p className="lead">긴 문서 속 꼭 확인해야 할 요점을 AI가 콕 집어드립니다.</p>
         <p className="description">
-          약관, 공지문, 논문을 입력하면 핵심 정보와 체크리스트를 빠르게 확인할 수 있습니다.
+          약관, 공지문, 논문을 입력하면 핵심 요점과 체크리스트를 빠르게 확인할 수 있습니다.
         </p>
       </section>
 
