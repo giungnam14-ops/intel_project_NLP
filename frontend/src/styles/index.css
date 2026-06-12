@@ -249,7 +249,19 @@ button, input, textarea { font: inherit; }
 
 .card-source-box strong { margin-bottom: 4px; font-size: 0.9rem; color: #1f5ea8; }
 
-.card-source-box p { margin: 0; color: #47617d; font-size: 0.95rem; }
+.card-source-box p { margin: 0; color: #47617d; font-size: 0.95rem; white-space: pre-wrap; }
+
+.source-toggle {
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1f5ea8;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.source-toggle:hover { text-decoration: underline; }
 
 .checklist-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 

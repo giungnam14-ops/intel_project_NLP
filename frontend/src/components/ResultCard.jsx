@@ -1,3 +1,7 @@
+import { useState } from 'react';
+
+const MAX_EXCERPT_LENGTH = 220;
+
 function getLevelClass(level) {
   const normalized = String(level || '').toLowerCase();
 
@@ -7,6 +11,14 @@ function getLevelClass(level) {
 }
 
 function ResultCard({ card }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const source = card.original_sentence || '';
+  const isLong = source.length > MAX_EXCERPT_LENGTH;
+  const visibleSource = isLong && !expanded
+    ? `${source.slice(0, MAX_EXCERPT_LENGTH)}…`
+    : source;
+
   return (
     <article className="result-card">
       <div className="card-topline">
@@ -17,7 +29,16 @@ function ResultCard({ card }) {
       <p className="card-message">{card.message}</p>
       <div className="card-source-box">
         <strong>원문</strong>
-        <p>{card.original_sentence}</p>
+        <p>{visibleSource}</p>
+        {isLong && (
+          <button
+            type="button"
+            className="source-toggle"
+            onClick={() => setExpanded((prev) => !prev)}
+          >
+            {expanded ? '접기' : '더 보기'}
+          </button>
+        )}
       </div>
     </article>
   );

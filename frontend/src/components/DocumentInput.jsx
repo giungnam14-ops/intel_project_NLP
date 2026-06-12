@@ -52,10 +52,85 @@ async function extractDocxText(file) {
   return (value || '').trim();
 }
 
+// Load a file into an HTMLImageElement.
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('image load error'));
+    };
+    img.src = url;
+  });
+}
+
+// Preprocess an image to improve OCR: upscale small images 2x, grayscale, and
+// apply a simple contrast stretch. Returns a canvas; falls back to the raw file
+// if anything goes wrong so OCR can still be attempted.
+async function preprocessImage(file) {
+  try {
+    const img = await loadImage(file);
+    const scale = Math.min(img.width, img.height) < 1000 ? 2 : 1;
+    const width = Math.round(img.width * scale);
+    const height = Math.round(img.height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+
+    ctx.drawImage(img, 0, 0, width, height);
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const px = imageData.data;
+    const contrast = 1.3; // mild contrast boost
+    for (let i = 0; i < px.length; i += 4) {
+      // grayscale (luminance)
+      const gray = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+      // contrast stretch around mid-gray
+      let value = (gray - 128) * contrast + 128;
+      value = Math.max(0, Math.min(255, value));
+      px[i] = value;
+      px[i + 1] = value;
+      px[i + 2] = value;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  } catch {
+    return file;
+  }
+}
+
 async function extractImageText(file) {
-  // Korean + English recognition. OCR accuracy varies with photo quality.
-  const { data } = await Tesseract.recognize(file, 'kor+eng');
+  // Korean + English recognition with document-oriented page segmentation.
+  // OCR accuracy varies with photo quality; preprocessing improves it but is not perfect.
+  const input = await preprocessImage(file);
+  const { data } = await Tesseract.recognize(input, 'kor+eng', {
+    tessedit_pageseg_mode: '6', // assume a single uniform block of text
+  });
   return (data?.text || '').trim();
+}
+
+// Heuristic for low-quality OCR. Does NOT block analysis — only warns.
+function isLowQualityOcr(textValue) {
+  const value = (textValue || '').trim();
+  if (value.length < 30) return true;
+
+  const koreanCount = (value.match(/[가-힣]/g) || []).length;
+  const lettersAndKorean = (value.match(/[가-힣a-zA-Z]/g) || []).length;
+  // For a Korean document, very low Korean ratio usually means garbled OCR.
+  if (lettersAndKorean > 0 && koreanCount / lettersAndKorean < 0.15) return true;
+
+  // Too many isolated symbols / fragments relative to meaningful characters.
+  const symbolCount = (value.match(/[^가-힣a-zA-Z0-9\s]/g) || []).length;
+  if (value.length > 0 && symbolCount / value.length > 0.4) return true;
+
+  return false;
 }
 
 function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }) {
@@ -133,8 +208,13 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
           setImportMessage('사진에서 텍스트를 충분히 인식하지 못했습니다. 밝은 곳에서 문서가 화면에 꽉 차게 다시 촬영해 주세요.');
           return;
         }
+        // Put OCR text into the textarea for review regardless of quality (do not block analysis).
         setText(recognized);
-        setImportMessage('');
+        if (isLowQualityOcr(recognized)) {
+          setImportMessage('OCR 인식 품질이 낮습니다. 문서가 화면에 꽉 차도록 다시 촬영하거나 인식된 문장을 직접 수정해 주세요.');
+        } else {
+          setImportMessage('사진에서 텍스트를 추출했습니다. 내용을 확인한 뒤 분석하기를 눌러 주세요.');
+        }
         return;
       }
 
@@ -216,7 +296,7 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
       </div>
 
       {importMessage && <p className="helper-text">{importMessage}</p>}
-      <p className="helper-text">.txt, .md, .pdf, .docx, 이미지 파일을 지원합니다. 사진 문서는 OCR로 텍스트를 추출합니다.</p>
+      <p className="helper-text">.txt, .md, .pdf, .docx, 이미지 파일을 지원합니다. 사진 문서는 OCR로 텍스트를 추출합니다. 인식 결과를 확인한 뒤 분석해 주세요.</p>
       <p className="helper-text">입력값은 FastAPI의 /analyze로 전송됩니다.</p>
     </section>
   );
