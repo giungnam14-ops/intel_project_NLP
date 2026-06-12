@@ -50,6 +50,31 @@ Cloudflare (DNS · HTTPS/TLS · WAF · Rate Limit)
 
 ---
 
+## 4.5 프론트엔드/백엔드 빌드·배포 설정
+
+> 실제 배포 URL은 아직 없으며, 아래는 배포 시 입력할 설정값이다. 가짜 URL은 사용하지 않는다.
+
+### 프론트엔드 (Cloudflare Pages)
+- 빌드 명령(build command): `npm run build`
+- 출력 디렉터리(output directory): `dist`
+- 루트 디렉터리(root directory): `frontend`
+- 환경 변수: `VITE_API_BASE_URL=<배포된 백엔드 URL>` (예: `https://your-backend.onrender.com`)
+  - 미설정 시 코드 폴백은 `http://127.0.0.1:8000`(로컬 개발용)이다.
+
+### 백엔드 (Render)
+- 저장소 루트의 [render.yaml](../render.yaml) 사용(runtime: python).
+- 빌드 명령: `pip install -r requirements.txt`
+- 시작 명령: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- 환경 변수: `BACKEND_ALLOWED_ORIGINS=<배포된 프론트엔드 URL>` (예: `https://your-frontend.pages.dev`)
+  - 콤마로 여러 origin 지정 가능. 미설정 시 로컬 개발 origin(`http://127.0.0.1:5173`, `http://localhost:5173`)으로 폴백한다.
+- 비밀값(secret)은 코드/문서에 포함하지 않고 Render 대시보드 환경 변수로만 설정한다.
+
+### 환경 변수 예시 파일
+- 백엔드: [.env.example](../.env.example)
+- 프론트엔드: [frontend/.env.example](../frontend/.env.example)
+
+---
+
 ## 5. HTTPS 체크리스트
 
 - [ ] 프론트엔드가 **https URL**로 서비스된다.

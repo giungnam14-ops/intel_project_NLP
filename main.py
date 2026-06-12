@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,9 +9,19 @@ from guardrails import apply_guardrails
 
 app = FastAPI(title="5초 문서체크 API", version="1.0.0")
 
+# Allowed CORS origins are read from the BACKEND_ALLOWED_ORIGINS env variable
+# (comma-separated). When unset, fall back to the local dev frontend origins so
+# local development keeps working without any configuration.
+_DEFAULT_ORIGINS = "http://127.0.0.1:5173,http://localhost:5173"
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("BACKEND_ALLOWED_ORIGINS", _DEFAULT_ORIGINS).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

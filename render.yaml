@@ -1,0 +1,12 @@
+# Render.com 배포 설정 (FastAPI 백엔드)
+# 비밀값은 포함하지 않는다. CORS origin은 Render 대시보드에서 환경 변수로 설정한다.
+services:
+  - type: web
+    name: munyo-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      # 배포된 프론트엔드 origin을 콤마로 구분해 대시보드에서 값 입력 (예: https://your-frontend.pages.dev)
+      - key: BACKEND_ALLOWED_ORIGINS
+        sync: false
