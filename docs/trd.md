@@ -1,4 +1,33 @@
-# TRD v1: 5초 문서체크
+# TRD v4: 5초 문서체크
+
+> **문서 정보**
+> - Document: TRD
+> - Version: **v4**
+> - Status: 중간 데모 및 내부 점검 피드백 + 아키텍처 변경 반영 후 업데이트(Updated after mid-demo feedback and architecture changes)
+> - Basis: [docs/feedback.md](./feedback.md), Guardrail 계층, RAG-like retriever, model routing
+> - 비고: 외부 사용자 대상 정량 평가는 수행하지 않았으며, 아래 평가 수치는 내부 테스트 케이스 및 중간 데모 기준임.
+
+---
+
+## 0. v4 변경 요약
+
+CLI 기반 기술 검증(v1)에서 출발해, 중간 데모 및 내부 점검 피드백([feedback.md](./feedback.md))과 백엔드 아키텍처 변경(Guardrail 계층, 경량 RAG-like, 모델 라우팅)을 반영하기 위해 TRD를 v4로 갱신했다. 기존 §1~§5(CLI 기반 v1 기술 범위)는 그대로 유지하고, 확장 기술 요구사항을 §6에 정리했다.
+
+**v4에서 반영된 기술/아키텍처 사항** (상세: §6):
+
+| # | 항목 | 위치 |
+| --- | --- | --- |
+| 1 | Guardrail 계층이 `/analyze` 분석 로직 앞뒤(Pre/Post)에 적용되는 구조 | §6.1 |
+| 2 | RAG-like retriever 구조(카테고리 기반 매칭, 벡터DB 미사용) | §6.2 |
+| 3 | `model_router.py` 라우팅 기준(rule_v1/v2 선택) | §6.3 |
+| 4 | `domain_knowledge.json` 구조(문서 유형 → 카테고리 → guide/caution) | §6.4 |
+| 5 | blocked 응답 구조 | §6.5 |
+| 6 | 추가 응답 필드: `domain_guide`, `domain_caution`, `guardrail_applied`, `blocked` | §6.6 |
+| 7 | `guardrail_eval.py` / `domain_eval.py` 평가 기준 | §6.7 |
+
+**MVP 범위 정직성 유지**: 실제 LLM API 미사용(규칙 기반 분석), 실제 fine-tuning 미수행, 실제 벡터DB 미사용(경량 RAG-like), Guardrail은 정규식 기반 MVP 수준, WAF는 문서화만 되어 있고 실제 배포는 하지 않은 상태이다.
+
+---
 
 ## 1. 문서 목적
 
