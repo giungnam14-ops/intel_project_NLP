@@ -49,7 +49,11 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     if not request.text or not request.text.strip():
         raise HTTPException(status_code=400, detail="text is required")
 
-    result = apply_guardrails(request.text, analyze_document)
+    result = apply_guardrails(
+        request.text,
+        analyze_document,
+        ocr_low_quality=request.ocr_low_quality,
+    )
 
     return AnalyzeResponse(
         document_type=result["document_type"],
@@ -64,6 +68,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         blocked_reason=result.get("blocked_reason", None),
         highlights=result.get("highlights", []),
         key_facts=result.get("key_facts", None) or KeyFacts(),
+        security_notice=result.get("security_notice", False),
     )
 
 

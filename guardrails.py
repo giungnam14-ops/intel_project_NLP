@@ -8,6 +8,55 @@ from prompt_injection import detect_prompt_injection
 
 MAX_INPUT_LENGTH = 5000
 
+_MAX_SECURITY_HIGHLIGHTS = 5
+
+
+def build_security_highlights(text: str, low_quality: bool = False) -> list[dict]:
+    """Turn prompt-injection-looking sentences into '보안 주의' highlights.
+
+    Used by /analyze so a document is still analyzed instead of hard-blocked.
+    The text passed in should already be PII-sanitized.
+    """
+    # Imported lazily to avoid any import-order surprises at module load.
+    from backend.extractor import split_sentences
+
+    base_reason = "문서 안에 AI 지시를 조작하려는 문구가 포함되어 있습니다."
+    ocr_caveat = " OCR 인식 오류 가능성이 있어 보안 주의 문구가 잘못 감지되었을 수 있습니다."
+    reason = base_reason + (ocr_caveat if low_quality else "")
+    severity = "medium" if low_quality else "high"
+
+    highlights: list[dict] = []
+    for sentence in split_sentences(text):
+        if detect_prompt_injection(sentence).get("detected"):
+            highlights.append(
+                {
+                    "id": f"security-{len(highlights) + 1}",
+                    "label": "보안 주의",
+                    "severity": severity,
+                    "source_text": sentence,
+                    "reason": reason,
+                }
+            )
+        if len(highlights) >= _MAX_SECURITY_HIGHLIGHTS:
+            break
+
+    # Detection may fire on the whole text but not on any single sentence.
+    if not highlights:
+        snippet = text.strip().replace("\n", " ")
+        if len(snippet) > 160:
+            snippet = snippet[:160] + "…"
+        highlights.append(
+            {
+                "id": "security-1",
+                "label": "보안 주의",
+                "severity": severity,
+                "source_text": snippet,
+                "reason": reason,
+            }
+        )
+
+    return highlights
+
 
 def run_pre_guardrail(text: str) -> dict:
     """Validate and sanitize user input before analysis."""
@@ -106,26 +155,55 @@ def run_tool_guardrail(tool_name: str, payload: dict) -> dict:
     return safe_mock_tool_call(tool_name, payload)
 
 
-def apply_guardrails(text: str, analyze_fn) -> dict:
-    """Run the full guardrail flow around analysis."""
+def apply_guardrails(text: str, analyze_fn, ocr_low_quality: bool = False) -> dict:
+    """Run the full guardrail flow around analysis.
+
+    Document-level prompt injection is NO LONGER a hard block: 문요 is a document
+    analyzer, so the document is still analyzed and the suspicious sentences are
+    surfaced as '보안 주의' highlights. Only genuinely unprocessable input
+    (empty / too long) is hard-blocked. User questions are still blocked in
+    /ask via document_qa, and tool calls via tool_guardrail.
+    """
     pre = run_pre_guardrail(text)
-    if pre.get("blocked"):
+    injection = pre.get("prompt_injection", {}) or {}
+    blocked_reason = pre.get("blocked_reason")
+
+    # Hard-block only for input we truly cannot analyze.
+    if pre.get("blocked") and blocked_reason in ("empty_input", "input_too_long"):
+        reason_text = (
+            "입력이 비어 있어 분석할 수 없습니다."
+            if blocked_reason == "empty_input"
+            else "입력 길이가 제한을 초과하여 분석할 수 없습니다. 문서를 나눠서 분석해 주세요."
+        )
         return {
             "document_type": "blocked",
-            "document_type_label": "차단된 입력",
-            "risk_level": "높음",
-            "summary": "안전 정책상 이 입력은 분석할 수 없습니다.",
+            "document_type_label": "분석 불가",
+            "risk_level": "보통",
+            "summary": reason_text,
             "cards": [],
-            "checklist": ["입력 문장에서 시스템 지시 우회 표현을 제거해 주세요."],
+            "checklist": ["입력 길이를 줄이거나 문서를 나눠서 다시 시도해 주세요."],
             "blocked": True,
-            "blocked_reason": pre.get("blocked_reason", "guardrail_blocked"),
+            "blocked_reason": blocked_reason,
             "warnings": pre.get("warnings", []),
             "guardrail_applied": True,
         }
 
     result = analyze_fn(pre["sanitized_text"])
     result = run_post_guardrail(result)
-    result.setdefault("warnings", []).extend(pre.get("warnings", []))
+
+    warnings = list(pre.get("warnings", []))
+
+    # Prompt injection inside the document → annotate, don't block.
+    if injection.get("detected"):
+        security = build_security_highlights(pre["sanitized_text"], ocr_low_quality)
+        result["highlights"] = security + list(result.get("highlights") or [])
+        result["security_notice"] = True
+        warnings.append("문서 안에 AI 지시를 조작하려는 표현이 있어 보안 주의 문장으로 표시했습니다.")
+    else:
+        result.setdefault("security_notice", False)
+
+    result["warnings"] = list(result.get("warnings", [])) + warnings
     result["guardrail_applied"] = True
     result["blocked"] = False
+    result.setdefault("blocked_reason", None)
     return result

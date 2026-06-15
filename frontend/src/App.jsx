@@ -43,6 +43,8 @@ function App() {
   const [autoTrigger, setAutoTrigger] = useState(null); // 'file' | 'camera' | null
   // Bumped to remount DocumentInput (reset its choose/direct/imported state).
   const [inputKey, setInputKey] = useState(0);
+  // Set when the imported document came from low-quality OCR (softens security detection).
+  const [ocrLowQuality, setOcrLowQuality] = useState(false);
 
   const hasResult = Boolean(result);
 
@@ -69,6 +71,12 @@ function App() {
     setText(SAMPLE_DOCUMENTS[type]);
     setError('');
     setResult(null);
+    setOcrLowQuality(false);
+  };
+
+  // DocumentInput reports the imported document's metadata (or null when cleared).
+  const handleDocMeta = (meta) => {
+    setOcrLowQuality(meta?.status === 'review');
   };
 
   const handleAnalyze = async () => {
@@ -82,7 +90,7 @@ function App() {
     setLoading(true);
 
     try {
-      const data = await analyzeDocument(text);
+      const data = await analyzeDocument(text, ocrLowQuality);
       setResult(data);
     } catch (err) {
       setResult(null);
@@ -96,6 +104,7 @@ function App() {
     setText('');
     setResult(null);
     setError('');
+    setOcrLowQuality(false);
     setInputKey((key) => key + 1);
   };
 
@@ -104,6 +113,7 @@ function App() {
     setResult(null);
     setError('');
     setText('');
+    setOcrLowQuality(false);
     setInputKey((key) => key + 1);
     setTab('analyze');
   };
@@ -169,6 +179,7 @@ function App() {
                     confirmOcr={settings.confirmOcr}
                     autoTrigger={autoTrigger}
                     onAutoTriggerHandled={() => setAutoTrigger(null)}
+                    onDocMeta={handleDocMeta}
                   />
                 </>
               )}

@@ -144,7 +144,8 @@ function DocumentInput({
   onExample,
   confirmOcr = true,
   autoTrigger = null,
-  onAutoTriggerHandled
+  onAutoTriggerHandled,
+  onDocMeta
 }) {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -177,6 +178,7 @@ function DocumentInput({
   const handleSelectDirect = () => {
     setMode('direct');
     setDocMeta(null);
+    onDocMeta?.(null);
     setImportMessage('');
   };
 
@@ -184,6 +186,7 @@ function DocumentInput({
     onExample(type);
     setMode('direct');
     setDocMeta(null);
+    onDocMeta?.(null);
     setShowEditor(false);
     setImportMessage('');
   };
@@ -202,8 +205,10 @@ function DocumentInput({
 
   // Show the imported-document card (and the preview) for an extracted file.
   const applyImported = (content, meta, openEditor) => {
+    const fullMeta = { ...meta, charCount: content.length };
     setText(content);
-    setDocMeta({ ...meta, charCount: content.length });
+    setDocMeta(fullMeta);
+    onDocMeta?.(fullMeta);
     setMode('imported');
     setShowEditor(Boolean(openEditor));
   };

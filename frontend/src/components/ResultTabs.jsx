@@ -23,8 +23,25 @@ function ResultTabs({ result, shortSource, documentText }) {
   const checklist = Array.isArray(result?.checklist) ? result.checklist : [];
   const visibleCards = cardsExpanded ? cards : cards.slice(0, INITIAL_CARDS);
 
+  const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
+  const hasSecurityNotice = Boolean(result?.security_notice)
+    || highlights.some((item) => item?.label === '보안 주의');
+
   return (
     <div className="result-tabs">
+      {hasSecurityNotice && (
+        <div className="security-banner" role="status">
+          <span className="security-banner-icon" aria-hidden="true">🔒</span>
+          <div>
+            <p className="security-banner-title">보안 주의</p>
+            <p className="security-banner-text">
+              문서 안에 AI 지시를 조작하려는 표현이 포함되어 있어 주의가 필요합니다.
+              문서 내용 자체는 계속 분석했지만, 해당 문장은 보안 주의 문장으로 표시했어요.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="result-tabbar" role="tablist" aria-label="분석 결과 보기">
         {TABS.map((item) => (
           <button

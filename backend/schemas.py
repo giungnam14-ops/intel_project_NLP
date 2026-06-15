@@ -6,6 +6,9 @@ from pydantic import BaseModel, ConfigDict, Field
 class AnalyzeRequest(BaseModel):
     text: str
     document_type: str = "auto"
+    # Hint from the client: text came from low-quality OCR, so soften security
+    # detection (optional, backward compatible).
+    ocr_low_quality: bool = False
 
 
 class AskRequest(BaseModel):
@@ -78,3 +81,6 @@ class AnalyzeResponse(BaseModel):
     # Optional, additive fields (Stage 1: highlights & key facts).
     highlights: list[Highlight] = []
     key_facts: KeyFacts = Field(default_factory=KeyFacts)
+    # True when the document contained AI-instruction-manipulating text that was
+    # surfaced as a '보안 주의' highlight instead of hard-blocking the analysis.
+    security_notice: bool = False
