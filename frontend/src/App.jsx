@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { analyzeDocument } from './api/analyze';
 import Checklist from './components/Checklist';
 import DocumentInput from './components/DocumentInput';
@@ -26,11 +26,6 @@ function App() {
   const [error, setError] = useState('');
 
   const hasResult = Boolean(result);
-
-  const summaryLabel = useMemo(() => {
-    if (!result) return '분석 결과가 여기에 표시됩니다.';
-    return `${result.document_type_label || result.document_type} · ${result.risk_level}`;
-  }, [result]);
 
   const handleExample = (type) => {
     setText(SAMPLE_DOCUMENTS[type]);
@@ -66,17 +61,30 @@ function App() {
   };
 
   return (
-    <main className="app-shell">
-      <section className="hero-card panel">
-        <p className="eyebrow">AI 문서 요점 체크</p>
-        <h1>문요</h1>
-        <p className="lead">긴 문서 속 꼭 확인해야 할 요점을 AI가 콕 집어드립니다.</p>
-        <p className="description">
-          약관, 공지문, 논문을 입력하면 핵심 요점과 체크리스트를 빠르게 확인할 수 있습니다.
-        </p>
-      </section>
+    <div className="app-viewport">
+      <div className="app-shell">
+        <header className="hero">
+          <div className="hero-top">
+            <div className="brand">
+              <span className="brand-mark" aria-hidden="true">문</span>
+              <span className="brand-text">
+                <span className="brand-name">문요</span>
+                <span className="brand-sub">AI 문서 요점 체크</span>
+              </span>
+            </div>
+            <span className="hero-badge">5초 안에 핵심 확인</span>
+          </div>
 
-      <section className="content-grid">
+          <h1 className="hero-lead">긴 문서 속 꼭 확인해야 할 요점을 AI가 콕 집어드립니다.</h1>
+          <p className="hero-desc">약관·공지문·논문을 넣으면 핵심 요점과 체크리스트를 바로 정리해 드려요.</p>
+
+          <div className="hero-tags">
+            <span className="hero-tag">📄 약관</span>
+            <span className="hero-tag">📢 공지문</span>
+            <span className="hero-tag">🔬 논문</span>
+          </div>
+        </header>
+
         <DocumentInput
           text={text}
           setText={setText}
@@ -86,38 +94,47 @@ function App() {
           onExample={handleExample}
         />
 
-        <article className="panel result-panel">
-          <div className="section-header">
+        <section className="card result-panel">
+          <div className="panel-head">
             <div>
               <p className="eyebrow">분석 결과</p>
-              <h2>빠르게 확인할 핵심 포인트</h2>
+              <h2 className="panel-title">빠르게 확인할 핵심 포인트</h2>
             </div>
-            <span className="sub-badge">5초 안에 핵심 확인</span>
+            {hasResult && <span className="count-badge">카드 {result.cards?.length || 0}개</span>}
           </div>
 
-          {error ? (
-            <div className="message error">{error}</div>
-          ) : (
-            <div className="message neutral">{summaryLabel}</div>
-          )}
-
-          {loading && <div className="message loading">분석 중입니다...</div>}
-
-          {!loading && !error && !hasResult && (
-            <div className="empty-state">
-              <p>문서를 입력하고 분석하기 버튼을 누르면 결과가 표시됩니다.</p>
-              <span>예시 버튼으로 바로 테스트해 보세요.</span>
+          {loading && (
+            <div className="state state-loading">
+              <span className="spinner" aria-hidden="true" />
+              <p>문서를 분석하고 있어요…</p>
+              <span>핵심 문장과 체크리스트를 정리하는 중입니다.</span>
             </div>
           )}
 
-          {hasResult && (
+          {!loading && error && (
+            <div className="state state-error" role="alert">
+              <span className="state-icon" aria-hidden="true">!</span>
+              <p>{error}</p>
+              <span>입력 내용을 확인한 뒤 다시 시도해 주세요.</span>
+            </div>
+          )}
+
+          {!loading && !error && !hasResult && (
+            <div className="state state-empty">
+              <span className="state-icon" aria-hidden="true">📄</span>
+              <p>아직 분석한 문서가 없어요.</p>
+              <span>문서를 입력하거나 예시 버튼을 눌러 바로 확인해 보세요.</span>
+            </div>
+          )}
+
+          {!loading && !error && hasResult && (
             <>
               <ResultSummary result={result} />
 
               <section className="result-section">
                 <div className="section-title-row">
                   <h3>핵심 카드</h3>
-                  <span>{result.cards?.length || 0}개</span>
+                  <span className="count-chip">{result.cards?.length || 0}</span>
                 </div>
                 <div className="card-grid">
                   {result.cards?.map((card, index) => (
@@ -129,15 +146,15 @@ function App() {
               <section className="result-section">
                 <div className="section-title-row">
                   <h3>체크리스트</h3>
-                  <span>{result.checklist?.length || 0}개</span>
+                  <span className="count-chip">{result.checklist?.length || 0}</span>
                 </div>
                 <Checklist items={result.checklist || []} />
               </section>
             </>
           )}
-        </article>
-      </section>
-    </main>
+        </section>
+      </div>
+    </div>
   );
 }
 

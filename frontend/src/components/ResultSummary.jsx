@@ -3,11 +3,11 @@ function ResultSummary({ result }) {
 
   return (
     <section className="summary-card">
-      <div className="pill-row">
-        <span className="pill pill-primary">{result.document_type_label || result.document_type}</span>
-        <span className="pill pill-accent">중요도 {result.risk_level}</span>
+      <div className="summary-pills">
+        <span className="summary-pill">{result.document_type_label || result.document_type}</span>
+        <span className="summary-pill summary-pill-risk">중요도 {result.risk_level}</span>
       </div>
-      <h3>한 줄 요약</h3>
+      <span className="summary-label">한 줄 요약</span>
       <p className="summary-text">{result.summary}</p>
     </section>
   );

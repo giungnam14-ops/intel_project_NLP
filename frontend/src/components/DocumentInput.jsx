@@ -243,21 +243,30 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
   };
 
   return (
-    <section className="panel input-panel">
-      <div className="section-header">
+    <section className="card input-panel">
+      <div className="panel-head">
         <div>
           <p className="eyebrow">문서 입력</p>
-          <h2>분석할 문서를 붙여넣으세요</h2>
+          <h2 className="panel-title">분석할 문서를 넣어 주세요</h2>
         </div>
-        <span className="sub-badge">FastAPI 연결</span>
       </div>
 
-      <div className="example-row">
-        <button type="button" className="ghost-button" onClick={() => onExample('terms')}>약관 예시</button>
-        <button type="button" className="ghost-button" onClick={() => onExample('notice')}>공지문 예시</button>
-        <button type="button" className="ghost-button" onClick={() => onExample('paper')}>논문 예시</button>
-        <button type="button" className="ghost-button" onClick={handleImportClick} disabled={disabled}>파일 가져오기</button>
-        <button type="button" className="ghost-button" onClick={handleCameraClick} disabled={disabled}>사진 찍어 분석하기</button>
+      <span className="group-label">예시로 빠르게 시작</span>
+      <div className="chip-row">
+        <button type="button" className="chip" onClick={() => onExample('terms')}>약관 예시</button>
+        <button type="button" className="chip" onClick={() => onExample('notice')}>공지문 예시</button>
+        <button type="button" className="chip" onClick={() => onExample('paper')}>논문 예시</button>
+      </div>
+
+      <div className="import-row">
+        <button type="button" className="import-button" onClick={handleImportClick} disabled={disabled}>
+          <span className="import-icon" aria-hidden="true">📁</span>
+          <span>파일 가져오기</span>
+        </button>
+        <button type="button" className="import-button" onClick={handleCameraClick} disabled={disabled}>
+          <span className="import-icon" aria-hidden="true">📷</span>
+          <span>사진 찍어 분석하기</span>
+        </button>
         <input
           ref={fileInputRef}
           type="file"
@@ -276,28 +285,37 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
       </div>
 
       <label className="sr-only" htmlFor="document-input">문서 입력</label>
-      <textarea
-        id="document-input"
-        className="input-box"
-        placeholder="분석할 문서를 붙여넣어 주세요."
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        rows={12}
-        disabled={disabled}
-      />
+      <div className="textarea-wrap">
+        <textarea
+          id="document-input"
+          className="input-box"
+          placeholder="분석할 문서를 붙여넣어 주세요."
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          rows={12}
+          disabled={disabled}
+        />
+        <span className="char-count">{text.length}자</span>
+      </div>
 
-      <div className="button-row">
+      <div className="action-bar">
         <button type="button" className="primary-button" onClick={onAnalyze} disabled={disabled}>
-          {loading ? '분석 중입니다...' : '분석하기'}
+          {loading ? (
+            <>
+              <span className="btn-spinner" aria-hidden="true" />
+              분석 중입니다…
+            </>
+          ) : (
+            '분석하기'
+          )}
         </button>
         <button type="button" className="secondary-button" onClick={onReset} disabled={disabled}>
           초기화
         </button>
       </div>
 
-      {importMessage && <p className="helper-text">{importMessage}</p>}
-      <p className="helper-text">.txt, .md, .pdf, .docx, 이미지 파일을 지원합니다. 사진 문서는 OCR로 텍스트를 추출합니다. 인식 결과를 확인한 뒤 분석해 주세요.</p>
-      <p className="helper-text">입력값은 FastAPI의 /analyze로 전송됩니다.</p>
+      {importMessage && <p className="helper-text helper-strong">{importMessage}</p>}
+      <p className="helper-text">.txt · .md · .pdf · .docx · 이미지 파일을 지원해요. 사진 문서는 OCR로 텍스트를 추출하니, 인식 결과를 확인한 뒤 분석해 주세요.</p>
     </section>
   );
 }

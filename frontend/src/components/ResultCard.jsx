@@ -19,16 +19,18 @@ function ResultCard({ card }) {
     ? `${source.slice(0, MAX_EXCERPT_LENGTH)}…`
     : source;
 
+  const levelClass = getLevelClass(card.level);
+
   return (
-    <article className="result-card">
+    <article className={`result-card level-${levelClass}`}>
       <div className="card-topline">
         <span className="card-category">{card.category}</span>
-        <span className={`level-chip level-${getLevelClass(card.level)}`}>{card.level}</span>
+        <span className={`level-chip level-${levelClass}`}>{card.level}</span>
       </div>
       <h4>{card.title}</h4>
       <p className="card-message">{card.message}</p>
       <div className="card-source-box">
-        <strong>원문</strong>
+        <span className="card-source-label" aria-hidden="true">📌 원문</span>
         <p>{visibleSource}</p>
         {isLong && (
           <button
