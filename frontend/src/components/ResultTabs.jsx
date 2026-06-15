@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import Checklist from './Checklist';
+import ConfirmChecklist from './ConfirmChecklist';
 import DocumentQA from './DocumentQA';
-import KeyFacts from './KeyFacts';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
@@ -17,9 +16,10 @@ const TABS = [
 const INITIAL_CARDS = 3;
 
 const QUICK_QUESTIONS = [
-  '환불 조건이 뭐야?',
   '돈 내야 하는 부분 알려줘',
-  '내가 해야 할 일이 뭐야?'
+  '내가 해야 할 일 알려줘',
+  '불리한 조건 있어?',
+  '근거 문장 보여줘'
 ];
 
 function ResultTabs({ result, shortSource, documentText }) {
@@ -29,7 +29,6 @@ function ResultTabs({ result, shortSource, documentText }) {
   const [quickInput, setQuickInput] = useState('');
 
   const cards = Array.isArray(result?.cards) ? result.cards : [];
-  const checklist = Array.isArray(result?.checklist) ? result.checklist : [];
   const visibleCards = cardsExpanded ? cards : cards.slice(0, INITIAL_CARDS);
 
   const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
@@ -90,11 +89,15 @@ function ResultTabs({ result, shortSource, documentText }) {
       <div className="result-tab-panel">
         {tab === 'summary' && (
           <>
+            {/* 1. 한 줄 결론 */}
             <ResultSummary result={result} />
 
-            {/* Quick ask — surface the Q&A right under the summary. */}
+            {/* 2. 지금 꼭 확인할 것 3개 (근거는 눌러서 펼침) */}
+            <TopPriorities result={result} />
+
+            {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">
-              <p className="quick-ask-title">문요에게 바로 물어보기</p>
+              <p className="quick-ask-title">궁금한 점이 있나요?</p>
               <div className="quick-ask-row">
                 <input
                   type="text"
@@ -134,17 +137,15 @@ function ResultTabs({ result, shortSource, documentText }) {
               </div>
             </section>
 
-            <TopPriorities result={result} />
-
-            <KeyFacts keyFacts={result?.key_facts} showCount={false} />
-
-            <SourceHighlights
-              highlights={result?.highlights}
-              initialCount={2}
-              title="주의해서 볼 문장"
-              showCount={false}
-              expandable={false}
-            />
+            {/* 4. 자세히 보기 */}
+            <div className="more-actions">
+              <button type="button" className="more-action-button" onClick={() => setTab('evidence')}>
+                근거 자세히 보기
+              </button>
+              <button type="button" className="more-action-button" onClick={() => setTab('check')}>
+                체크리스트 보기
+              </button>
+            </div>
           </>
         )}
 
@@ -159,11 +160,11 @@ function ResultTabs({ result, shortSource, documentText }) {
 
         {tab === 'evidence' && (
           <>
-            <SourceHighlights highlights={result?.highlights} />
+            <SourceHighlights highlights={result?.highlights} title="주의해서 볼 문장" />
 
             <section className="result-section">
               <div className="section-title-row">
-                <h3>상세 분석</h3>
+                <h3>자세한 근거</h3>
                 <span className="count-chip">{cards.length}</span>
               </div>
 
@@ -180,30 +181,18 @@ function ResultTabs({ result, shortSource, documentText }) {
                       className="more-button"
                       onClick={() => setCardsExpanded((prev) => !prev)}
                     >
-                      {cardsExpanded ? '접기' : `상세 분석 ${cards.length - INITIAL_CARDS}개 더 보기`}
+                      {cardsExpanded ? '접기' : `자세한 근거 ${cards.length - INITIAL_CARDS}개 더 보기`}
                     </button>
                   )}
                 </>
               ) : (
-                <p className="tab-empty">상세 분석 항목이 없습니다.</p>
+                <p className="tab-empty">자세한 근거 항목이 없습니다.</p>
               )}
             </section>
           </>
         )}
 
-        {tab === 'check' && (
-          <section className="result-section">
-            <div className="section-title-row">
-              <h3>체크리스트</h3>
-              <span className="count-chip">{checklist.length}</span>
-            </div>
-            {checklist.length > 0 ? (
-              <Checklist items={checklist} />
-            ) : (
-              <p className="tab-empty">체크리스트 항목이 없습니다.</p>
-            )}
-          </section>
-        )}
+        {tab === 'check' && <ConfirmChecklist result={result} />}
       </div>
     </div>
   );
