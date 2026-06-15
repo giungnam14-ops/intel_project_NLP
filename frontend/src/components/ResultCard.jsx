@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 const MAX_EXCERPT_LENGTH = 220;
+const SHORT_EXCERPT_LENGTH = 110;
 
 function getLevelClass(level) {
   const normalized = String(level || '').toLowerCase();
@@ -10,13 +11,14 @@ function getLevelClass(level) {
   return 'info';
 }
 
-function ResultCard({ card }) {
+function ResultCard({ card, shortSource = false }) {
   const [expanded, setExpanded] = useState(false);
 
+  const excerptLength = shortSource ? SHORT_EXCERPT_LENGTH : MAX_EXCERPT_LENGTH;
   const source = card.original_sentence || '';
-  const isLong = source.length > MAX_EXCERPT_LENGTH;
+  const isLong = source.length > excerptLength;
   const visibleSource = isLong && !expanded
-    ? `${source.slice(0, MAX_EXCERPT_LENGTH)}…`
+    ? `${source.slice(0, excerptLength)}…`
     : source;
 
   const levelClass = getLevelClass(card.level);

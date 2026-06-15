@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth/mammoth.browser';
@@ -133,7 +133,17 @@ function isLowQualityOcr(textValue) {
   return false;
 }
 
-function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }) {
+function DocumentInput({
+  text,
+  setText,
+  loading,
+  onAnalyze,
+  onReset,
+  onExample,
+  confirmOcr = true,
+  autoTrigger = null,
+  onAutoTriggerHandled
+}) {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const [importMessage, setImportMessage] = useState('');
@@ -148,6 +158,18 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
   const handleCameraClick = () => {
     cameraInputRef.current?.click();
   };
+
+  // Allow the Home screen to deep-link straight into a file / camera picker.
+  // This only opens the existing native input; it does not alter extraction logic.
+  useEffect(() => {
+    if (!autoTrigger) return;
+    if (autoTrigger === 'file') {
+      fileInputRef.current?.click();
+    } else if (autoTrigger === 'camera') {
+      cameraInputRef.current?.click();
+    }
+    onAutoTriggerHandled?.();
+  }, [autoTrigger, onAutoTriggerHandled]);
 
   const processFile = async (file) => {
     const extension = getExtension(file);
@@ -212,8 +234,10 @@ function DocumentInput({ text, setText, loading, onAnalyze, onReset, onExample }
         setText(recognized);
         if (isLowQualityOcr(recognized)) {
           setImportMessage('OCR 인식 품질이 낮습니다. 문서가 화면에 꽉 차도록 다시 촬영하거나 인식된 문장을 직접 수정해 주세요.');
-        } else {
+        } else if (confirmOcr) {
           setImportMessage('사진에서 텍스트를 추출했습니다. 내용을 확인한 뒤 분석하기를 눌러 주세요.');
+        } else {
+          setImportMessage('사진에서 텍스트를 추출했습니다.');
         }
         return;
       }

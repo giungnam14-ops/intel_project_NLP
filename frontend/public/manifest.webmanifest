@@ -1,0 +1,21 @@
+{
+  "name": "문요",
+  "short_name": "문요",
+  "description": "긴 문서 속 꼭 확인해야 할 요점을 AI가 콕 집어주는 문서 요점 체크 앱",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f8ff",
+  "theme_color": "#2b7fff",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

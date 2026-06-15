@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { analyzeDocument } from './api/analyze';
-import Checklist from './components/Checklist';
+import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
-import ResultCard from './components/ResultCard';
-import ResultSummary from './components/ResultSummary';
+import HomeScreen from './components/HomeScreen';
+import ResultView from './components/ResultView';
+import SettingsScreen from './components/SettingsScreen';
 
 const SAMPLE_DOCUMENTS = {
   terms: `이용 약관에 따라 회원은 서비스 이용을 시작한 날로부터 자동결제가 이루어집니다.
@@ -19,13 +20,48 @@ const SAMPLE_DOCUMENTS = {
 이 연구의 한계점은 도메인별 어휘 차이에 대한 일반화 성능이 제한적이라는 점이다.`
 };
 
+const SETTINGS_KEY = 'munyo-settings';
+const DEFAULT_SETTINGS = { confirmOcr: true, shortSource: false, largeText: false };
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
 function App() {
+  const [tab, setTab] = useState('home');
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [settings, setSettings] = useState(loadSettings);
+  const [autoTrigger, setAutoTrigger] = useState(null); // 'file' | 'camera' | null
 
   const hasResult = Boolean(result);
+
+  // Persist settings locally (browser only — no backend, no account).
+  useEffect(() => {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    } catch {
+      // localStorage may be unavailable (private mode); settings stay in-memory.
+    }
+  }, [settings]);
+
+  // Large-text mode toggles a root class so rem-based sizing scales up.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('is-large-text', settings.largeText);
+  }, [settings.largeText]);
+
+  const updateSetting = (key, value) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleExample = (type) => {
     setText(SAMPLE_DOCUMENTS[type]);
@@ -60,99 +96,85 @@ function App() {
     setError('');
   };
 
+  // "새 문서 분석하기" — clear the result and return to a fresh input.
+  const handleNewAnalysis = () => {
+    setResult(null);
+    setError('');
+    setText('');
+    setTab('analyze');
+  };
+
+  const goAnalyze = () => {
+    setTab('analyze');
+  };
+
+  const startWithPicker = (which) => {
+    setResult(null);
+    setError('');
+    setTab('analyze');
+    setAutoTrigger(which);
+  };
+
   return (
     <div className="app-viewport">
-      <div className="app-shell">
-        <header className="hero">
-          <div className="hero-top">
-            <div className="brand">
-              <span className="brand-mark" aria-hidden="true">문</span>
-              <span className="brand-text">
-                <span className="brand-name">문요</span>
-                <span className="brand-sub">AI 문서 요점 체크</span>
-              </span>
-            </div>
-            <span className="hero-badge">5초 안에 핵심 확인</span>
-          </div>
-
-          <h1 className="hero-lead">긴 문서 속 꼭 확인해야 할 요점을 AI가 콕 집어드립니다.</h1>
-          <p className="hero-desc">약관·공지문·논문을 넣으면 핵심 요점과 체크리스트를 바로 정리해 드려요.</p>
-
-          <div className="hero-tags">
-            <span className="hero-tag">📄 약관</span>
-            <span className="hero-tag">📢 공지문</span>
-            <span className="hero-tag">🔬 논문</span>
-          </div>
-        </header>
-
-        <DocumentInput
-          text={text}
-          setText={setText}
-          loading={loading}
-          onAnalyze={handleAnalyze}
-          onReset={handleReset}
-          onExample={handleExample}
-        />
-
-        <section className="card result-panel">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">분석 결과</p>
-              <h2 className="panel-title">빠르게 확인할 핵심 포인트</h2>
-            </div>
-            {hasResult && <span className="count-badge">카드 {result.cards?.length || 0}개</span>}
-          </div>
-
-          {loading && (
-            <div className="state state-loading">
-              <span className="spinner" aria-hidden="true" />
-              <p>문서를 분석하고 있어요…</p>
-              <span>핵심 문장과 체크리스트를 정리하는 중입니다.</span>
-            </div>
+      <div className="app-frame">
+        <main className="app-main">
+          {tab === 'home' && (
+            <HomeScreen
+              onStart={goAnalyze}
+              onImport={() => startWithPicker('file')}
+              onCamera={() => startWithPicker('camera')}
+            />
           )}
 
-          {!loading && error && (
-            <div className="state state-error" role="alert">
-              <span className="state-icon" aria-hidden="true">!</span>
-              <p>{error}</p>
-              <span>입력 내용을 확인한 뒤 다시 시도해 주세요.</span>
-            </div>
-          )}
-
-          {!loading && !error && !hasResult && (
-            <div className="state state-empty">
-              <span className="state-icon" aria-hidden="true">📄</span>
-              <p>아직 분석한 문서가 없어요.</p>
-              <span>문서를 입력하거나 예시 버튼을 눌러 바로 확인해 보세요.</span>
-            </div>
-          )}
-
-          {!loading && !error && hasResult && (
-            <>
-              <ResultSummary result={result} />
-
-              <section className="result-section">
-                <div className="section-title-row">
-                  <h3>핵심 카드</h3>
-                  <span className="count-chip">{result.cards?.length || 0}</span>
+          {tab === 'analyze' && (
+            <div className="screen analyze-screen">
+              <header className="screen-bar">
+                <div>
+                  <h1 className="screen-bar-title">문서 분석</h1>
+                  <p className="screen-bar-sub">
+                    {hasResult ? '분석이 끝났어요' : '문서를 입력하고 분석하세요'}
+                  </p>
                 </div>
-                <div className="card-grid">
-                  {result.cards?.map((card, index) => (
-                    <ResultCard key={`${card.category}-${index}`} card={card} />
-                  ))}
-                </div>
-              </section>
+                <span className="brand-chip">문요</span>
+              </header>
 
-              <section className="result-section">
-                <div className="section-title-row">
-                  <h3>체크리스트</h3>
-                  <span className="count-chip">{result.checklist?.length || 0}</span>
-                </div>
-                <Checklist items={result.checklist || []} />
-              </section>
-            </>
+              {hasResult && !loading ? (
+                <ResultView
+                  result={result}
+                  shortSource={settings.shortSource}
+                  onNew={handleNewAnalysis}
+                />
+              ) : (
+                <>
+                  {error && (
+                    <div className="banner-error" role="alert">
+                      <span className="banner-error-icon" aria-hidden="true">!</span>
+                      <span>{error}</span>
+                    </div>
+                  )}
+                  <DocumentInput
+                    text={text}
+                    setText={setText}
+                    loading={loading}
+                    onAnalyze={handleAnalyze}
+                    onReset={handleReset}
+                    onExample={handleExample}
+                    confirmOcr={settings.confirmOcr}
+                    autoTrigger={autoTrigger}
+                    onAutoTriggerHandled={() => setAutoTrigger(null)}
+                  />
+                </>
+              )}
+            </div>
           )}
-        </section>
+
+          {tab === 'settings' && (
+            <SettingsScreen settings={settings} onChange={updateSetting} />
+          )}
+        </main>
+
+        <BottomNav active={tab} onChange={setTab} />
       </div>
     </div>
   );
