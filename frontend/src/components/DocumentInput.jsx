@@ -368,6 +368,9 @@ function DocumentInput({
 
       {mode === 'choose' && (
         <>
+          <p className="input-guide">
+            문서를 직접 입력하거나 파일/사진을 가져오면 분석을 시작할 수 있어요.
+          </p>
           <div className="import-options">
             <button type="button" className="option-button" onClick={handleSelectDirect} disabled={disabled}>
               <span className="option-icon" aria-hidden="true">✍️</span>

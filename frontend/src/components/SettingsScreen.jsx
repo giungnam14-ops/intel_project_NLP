@@ -1,3 +1,5 @@
+import HowToUse from './HowToUse';
+
 function SettingToggle({ label, desc, checked, onChange }) {
   return (
     <label className="setting-row">
@@ -27,6 +29,19 @@ function SettingsScreen({ settings, onChange }) {
         </div>
         <span className="brand-chip">문요</span>
       </header>
+
+      <section className="settings-group">
+        <h2 className="settings-group-title">사용 방법</h2>
+        <HowToUse title="문요 3단계로 쓰기" />
+        <div className="card settings-card info-text">
+          <ul className="howto-points">
+            <li>파일/사진을 가져오면 문요가 텍스트를 추출합니다.</li>
+            <li>추출된 내용은 분석 전 확인하고 수정할 수 있습니다.</li>
+            <li>결과는 요점·물어보기·근거·체크 탭으로 나뉩니다.</li>
+            <li>파일 원본은 서버에 저장하지 않습니다.</li>
+          </ul>
+        </div>
+      </section>
 
       <section className="settings-group">
         <h2 className="settings-group-title">분석 환경설정</h2>

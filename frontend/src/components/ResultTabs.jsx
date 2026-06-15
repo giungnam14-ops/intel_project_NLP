@@ -89,6 +89,10 @@ function ResultTabs({ result, shortSource, documentText }) {
       <div className="result-tab-panel">
         {tab === 'summary' && (
           <>
+            <p className="tab-help">
+              먼저 확인할 3가지만 보고, 더 자세한 내용은 근거·체크 탭에서 볼 수 있어요.
+            </p>
+
             {/* 1. 한 줄 결론 */}
             <ResultSummary result={result} />
 

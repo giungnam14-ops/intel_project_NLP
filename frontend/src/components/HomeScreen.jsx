@@ -1,4 +1,26 @@
+import { useState } from 'react';
+import HowToUse from './HowToUse';
+
+const GUIDE_KEY = 'munyo-guide-dismissed';
+
 function HomeScreen({ onStart, onImport, onCamera }) {
+  const [showGuide, setShowGuide] = useState(() => {
+    try {
+      return localStorage.getItem(GUIDE_KEY) !== '1';
+    } catch {
+      return true;
+    }
+  });
+
+  const dismissGuide = () => {
+    setShowGuide(false);
+    try {
+      localStorage.setItem(GUIDE_KEY, '1');
+    } catch {
+      // localStorage unavailable (private mode) — guide just stays hidden this session.
+    }
+  };
+
   return (
     <div className="screen home-screen">
       <header className="home-hero">
@@ -28,6 +50,8 @@ function HomeScreen({ onStart, onImport, onCamera }) {
           </button>
         </div>
       </header>
+
+      {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
 
       <section className="home-section">
         <h2 className="home-section-title">이런 문서에 딱 맞아요</h2>

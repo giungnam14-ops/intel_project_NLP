@@ -1374,6 +1374,91 @@ button, input, textarea { font: inherit; }
 
 .more-button:hover { background: #e7f1ff; border-color: #bcd6ff; }
 
+/* ---------- How-to-use onboarding ---------- */
+.howto {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.howto-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.howto-title { margin: 0; font-size: 1.12rem; font-weight: 800; color: var(--c-ink); }
+
+.howto-close {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.howto-close:hover { background: #e7f1ff; color: var(--c-primary-strong); }
+
+.howto-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+
+.howto-step { display: flex; align-items: flex-start; gap: 11px; }
+
+.howto-num {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--grad-brand);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.howto-emoji { font-size: 1.2rem; line-height: 1.2; flex-shrink: 0; }
+
+.howto-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.howto-text strong { font-size: 1rem; font-weight: 800; color: var(--c-ink); }
+.howto-text small { font-size: 0.9rem; color: var(--c-ink-soft); line-height: 1.5; }
+
+.howto-points {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--c-ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+/* ---------- Inline guide / help notes ---------- */
+.input-guide {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.tab-help {
+  margin: 0 0 14px;
+  color: var(--c-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 /* ---------- Top priorities (먼저 확인할 3가지) ---------- */
 .top-priorities {
   background: linear-gradient(180deg, #f4f9ff, #ffffff);
