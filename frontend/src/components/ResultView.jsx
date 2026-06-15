@@ -1,6 +1,8 @@
 import Checklist from './Checklist';
+import KeyFacts from './KeyFacts';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
+import SourceHighlights from './SourceHighlights';
 
 function ResultView({ result, shortSource, onNew }) {
   if (!result) return null;
@@ -14,6 +16,10 @@ function ResultView({ result, shortSource, onNew }) {
       </div>
 
       <ResultSummary result={result} />
+
+      {/* Additive Stage 1 sections — render only when the optional fields exist. */}
+      <SourceHighlights highlights={result.highlights} />
+      <KeyFacts keyFacts={result.key_facts} />
 
       <section className="result-section">
         <div className="section-title-row">

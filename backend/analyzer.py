@@ -6,6 +6,7 @@ from backend.classifier import classify_document
 from backend.checklist import generate_checklist
 from backend.explainer import explain_item
 from backend.extractor import extract_items
+from backend.key_facts import build_insights, empty_facts
 
 
 _DOCUMENT_TYPE_LABELS = {
@@ -27,6 +28,8 @@ def analyze_document(text: str) -> dict:
             "summary": "문서가 비어 있어 분석할 내용이 없습니다.",
             "cards": [],
             "checklist": ["문서를 붙여넣어 분석을 시작하세요."],
+            "highlights": [],
+            "key_facts": empty_facts(),
         }
 
     document_type = classify_document(cleaned)
@@ -57,6 +60,8 @@ def analyze_document(text: str) -> dict:
 
     risk_level = "높음" if any(card["level"] == "높음" for card in cards) else "보통"
 
+    insights = build_insights(cleaned)
+
     return {
         "document_type": document_type,
         "document_type_label": document_type_label,
@@ -64,4 +69,6 @@ def analyze_document(text: str) -> dict:
         "summary": summary,
         "cards": cards,
         "checklist": checklist,
+        "highlights": insights["highlights"],
+        "key_facts": insights["key_facts"],
     }

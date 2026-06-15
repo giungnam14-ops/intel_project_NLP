@@ -1056,6 +1056,150 @@ button, input, textarea { font: inherit; }
 .info-text { padding: 16px; }
 .info-text p { margin: 0; color: var(--c-ink-soft); font-size: 0.95rem; line-height: 1.65; }
 
+/* ---------- Key facts (꼭 확인할 정보) ---------- */
+.keyfacts { display: flex; flex-direction: column; gap: 16px; }
+
+.keyfact-group { display: flex; flex-direction: column; gap: 10px; }
+
+.keyfact-group-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.keyfact-emoji { font-size: 1.2rem; line-height: 1; }
+
+.keyfact-group-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--c-ink);
+}
+
+.keyfact-group-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  color: var(--c-primary-strong);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.keyfact-list { display: grid; gap: 10px; }
+
+.keyfact-card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-line);
+  background: #fff;
+  padding: 13px 14px;
+  box-shadow: var(--shadow-soft);
+  border-left: 4px solid var(--c-primary);
+}
+
+.keyfact-label {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--c-muted);
+}
+
+.keyfact-value {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--c-ink);
+  letter-spacing: -0.01em;
+  word-break: break-word;
+}
+
+.keyfact-source {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  color: var(--c-ink-soft);
+  line-height: 1.55;
+}
+
+.keyfact-source-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  color: var(--c-primary-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* Category accent colors on the left border */
+.keyfact-money .keyfact-card { border-left-color: #2f9e6f; }
+.keyfact-dates .keyfact-card { border-left-color: #2b7fff; }
+.keyfact-actions .keyfact-card { border-left-color: #6b5bd2; }
+.keyfact-warnings .keyfact-card { border-left-color: #e0772a; }
+
+/* ---------- Source highlights (주의 문장) ---------- */
+.highlight-list { display: grid; gap: 12px; }
+
+.highlight-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-line);
+  background: #fff;
+  padding: 15px 16px;
+  box-shadow: var(--shadow-soft);
+  border-left: 5px solid var(--c-primary);
+}
+
+.highlight-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.highlight-label {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--c-ink);
+}
+
+.sev-chip {
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.highlight-source {
+  margin: 0 0 8px;
+  color: var(--c-ink);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.highlight-reason {
+  margin: 0;
+  color: var(--c-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* Severity theming: high = red/orange, medium = yellow, low = blue/gray */
+.highlight-card.sev-high { border-left-color: #e3502f; background: #fff6f3; }
+.highlight-card.sev-medium { border-left-color: #e0a52a; background: #fffaef; }
+.highlight-card.sev-low { border-left-color: #2b7fff; background: #f4f9ff; }
+
+.sev-chip.sev-high { background: #ffe2db; color: #c0492f; }
+.sev-chip.sev-medium { background: #fdefc6; color: #9a6a0d; }
+.sev-chip.sev-low { background: #e3effd; color: #1f6fe0; }
+
 /* ---------- Large-text accessibility mode ---------- */
 html.is-large-text { font-size: 18px; }
 
