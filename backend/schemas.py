@@ -84,3 +84,7 @@ class AnalyzeResponse(BaseModel):
     # True when the document contained AI-instruction-manipulating text that was
     # surfaced as a '보안 주의' highlight instead of hard-blocking the analysis.
     security_notice: bool = False
+    # True when the document was long enough to be analyzed in "long document"
+    # mode (key-sentence focused). processing_note explains it to the user.
+    long_document: bool = False
+    processing_note: str | None = None

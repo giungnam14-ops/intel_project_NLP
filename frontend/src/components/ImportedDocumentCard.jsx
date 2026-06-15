@@ -11,12 +11,16 @@ const STATUS_META = {
   review: { label: '확인 필요', cls: 'warn' }
 };
 
+// Matches the backend LONG_DOCUMENT_THRESHOLD (characters).
+const LONG_DOCUMENT_CHARS = 12000;
+
 function ImportedDocumentCard({ meta, editorOpen, onToggleEditor, onReimport }) {
   if (!meta) return null;
 
   const status = STATUS_META[meta.status] || STATUS_META.extracted;
   const icon = KIND_ICONS[meta.kind] || '📄';
   const charCount = Number(meta.charCount || 0);
+  const isLong = charCount >= LONG_DOCUMENT_CHARS;
 
   return (
     <section className={`imported-card${status.cls === 'warn' ? ' imported-card--review' : ''}`}>
@@ -29,6 +33,7 @@ function ImportedDocumentCard({ meta, editorOpen, onToggleEditor, onReimport }) 
             <span className="imported-tag">{meta.kind}</span>
             <span className={`imported-status imported-status-${status.cls}`}>{status.label}</span>
             <span className="imported-tag">{charCount.toLocaleString()}자</span>
+            {isLong && <span className="imported-tag imported-tag-long">긴 문서 · 핵심 위주 분석</span>}
           </div>
         </div>
       </div>

@@ -69,6 +69,8 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         highlights=result.get("highlights", []),
         key_facts=result.get("key_facts", None) or KeyFacts(),
         security_notice=result.get("security_notice", False),
+        long_document=result.get("long_document", False),
+        processing_note=result.get("processing_note", None),
     )
 
 

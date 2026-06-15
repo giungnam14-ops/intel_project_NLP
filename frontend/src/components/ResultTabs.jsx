@@ -26,9 +26,23 @@ function ResultTabs({ result, shortSource, documentText }) {
   const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
   const hasSecurityNotice = Boolean(result?.security_notice)
     || highlights.some((item) => item?.label === '보안 주의');
+  const isLongDocument = Boolean(result?.long_document) || Boolean(result?.processing_note);
 
   return (
     <div className="result-tabs">
+      {isLongDocument && (
+        <div className="longdoc-banner" role="status">
+          <span className="longdoc-banner-icon" aria-hidden="true">📚</span>
+          <div>
+            <p className="longdoc-banner-title">긴 문서 모드로 분석했어요.</p>
+            <p className="longdoc-banner-text">
+              {result?.processing_note
+                || '문서 전체를 한 번에 보여주기보다, 핵심 문장과 주의 표현을 중심으로 요약했습니다.'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {hasSecurityNotice && (
         <div className="security-banner" role="status">
           <span className="security-banner-icon" aria-hidden="true">🔒</span>
