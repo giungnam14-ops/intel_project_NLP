@@ -31,3 +31,30 @@ export async function analyzeDocument(text) {
 
   return response.json();
 }
+
+export async function askDocument(text, question) {
+  const response = await fetch(`${API_BASE_URL}/ask`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text, question })
+  });
+
+  if (!response.ok) {
+    let message = '질문에 답변하는 중 문제가 발생했습니다.';
+
+    try {
+      const errorBody = await response.json();
+      if (errorBody?.detail && typeof errorBody.detail === 'string') {
+        message = errorBody.detail;
+      }
+    } catch {
+      // Ignore JSON parsing errors and fall back to the default message.
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json();
+}

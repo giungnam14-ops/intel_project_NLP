@@ -1,10 +1,11 @@
 import Checklist from './Checklist';
+import DocumentQA from './DocumentQA';
 import KeyFacts from './KeyFacts';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
 
-function ResultView({ result, shortSource, onNew }) {
+function ResultView({ result, shortSource, documentText, onNew }) {
   if (!result) return null;
 
   return (
@@ -20,6 +21,9 @@ function ResultView({ result, shortSource, onNew }) {
       {/* Additive Stage 1 sections — render only when the optional fields exist. */}
       <SourceHighlights highlights={result.highlights} />
       <KeyFacts keyFacts={result.key_facts} />
+
+      {/* Stage 2: ask questions grounded in this document. */}
+      <DocumentQA documentText={documentText} />
 
       <section className="result-section">
         <div className="section-title-row">

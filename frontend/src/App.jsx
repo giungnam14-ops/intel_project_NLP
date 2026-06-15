@@ -143,6 +143,7 @@ function App() {
                 <ResultView
                   result={result}
                   shortSource={settings.shortSource}
+                  documentText={text}
                   onNew={handleNewAnalysis}
                 />
               ) : (

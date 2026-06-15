@@ -8,6 +8,25 @@ class AnalyzeRequest(BaseModel):
     document_type: str = "auto"
 
 
+class AskRequest(BaseModel):
+    text: str
+    question: str = ""
+
+
+class EvidenceItem(BaseModel):
+    source_text: str
+    label: str
+
+
+class AskResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    answer: str
+    confidence: str
+    evidence: list[EvidenceItem] = []
+    suggested_followups: list[str] = []
+
+
 class AnalyzeCard(BaseModel):
     category: str
     title: str

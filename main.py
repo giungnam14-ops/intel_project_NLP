@@ -4,7 +4,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.analyzer import analyze_document
-from backend.schemas import AnalyzeRequest, AnalyzeResponse, AnalyzeCard, KeyFacts
+from backend.document_qa import answer_question
+from backend.schemas import (
+    AnalyzeRequest,
+    AnalyzeResponse,
+    AnalyzeCard,
+    AskRequest,
+    AskResponse,
+    EvidenceItem,
+    KeyFacts,
+)
 from guardrails import apply_guardrails
 
 app = FastAPI(title="5초 문서체크 API", version="1.0.0")
@@ -55,4 +64,20 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         blocked_reason=result.get("blocked_reason", None),
         highlights=result.get("highlights", []),
         key_facts=result.get("key_facts", None) or KeyFacts(),
+    )
+
+
+@app.post("/ask", response_model=AskResponse)
+def ask(request: AskRequest) -> AskResponse:
+    """Answer a question grounded in the provided document text (no external LLM)."""
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="text is required")
+
+    result = answer_question(request.text, request.question)
+
+    return AskResponse(
+        answer=result.get("answer", ""),
+        confidence=result.get("confidence", "low"),
+        evidence=[EvidenceItem(**item) for item in result.get("evidence", [])],
+        suggested_followups=result.get("suggested_followups", []),
     )
