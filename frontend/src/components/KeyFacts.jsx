@@ -7,7 +7,22 @@ const GROUPS = [
   { key: 'warnings', icon: '⚠️', title: '주의사항' }
 ];
 
-function KeyFacts({ keyFacts, previewCount = 2 }) {
+// Default items shown per category before "전체 보기" (actions get 2, rest 1).
+const DEFAULT_PREVIEW = { money: 1, dates: 1, actions: 2, warnings: 1 };
+
+function dedupeByValue(items) {
+  const seen = new Set();
+  const out = [];
+  for (const item of items) {
+    const value = item?.value;
+    if (!value || seen.has(value)) continue;
+    seen.add(value);
+    out.push(item);
+  }
+  return out;
+}
+
+function KeyFacts({ keyFacts, previewCounts = DEFAULT_PREVIEW, showCount = true }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!keyFacts || typeof keyFacts !== 'object') return null;
@@ -15,25 +30,26 @@ function KeyFacts({ keyFacts, previewCount = 2 }) {
   const groups = GROUPS
     .map((group) => ({
       ...group,
-      items: Array.isArray(keyFacts[group.key]) ? keyFacts[group.key] : []
+      items: dedupeByValue(Array.isArray(keyFacts[group.key]) ? keyFacts[group.key] : [])
     }))
     .filter((group) => group.items.length > 0);
 
   if (groups.length === 0) return null;
 
+  const previewFor = (key) => previewCounts[key] ?? 1;
   const total = groups.reduce((sum, group) => sum + group.items.length, 0);
-  const hasMore = groups.some((group) => group.items.length > previewCount);
+  const hasMore = groups.some((group) => group.items.length > previewFor(group.key));
 
   return (
     <section className="result-section">
       <div className="section-title-row">
         <h3>꼭 확인할 정보</h3>
-        <span className="count-chip">{total}</span>
+        {showCount && <span className="count-chip">{total}</span>}
       </div>
 
       <div className="keyfacts">
         {groups.map((group) => {
-          const items = expanded ? group.items : group.items.slice(0, previewCount);
+          const items = expanded ? group.items : group.items.slice(0, previewFor(group.key));
           return (
             <div className={`keyfact-group keyfact-${group.key}`} key={group.key}>
               <div className="keyfact-group-head">
@@ -63,7 +79,7 @@ function KeyFacts({ keyFacts, previewCount = 2 }) {
 
       {hasMore && (
         <button type="button" className="more-button" onClick={() => setExpanded((prev) => !prev)}>
-          {expanded ? '접기' : '항목 더 보기'}
+          {expanded ? '접기' : '전체 보기'}
         </button>
       )}
     </section>

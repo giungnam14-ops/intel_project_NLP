@@ -5,19 +5,28 @@ import KeyFacts from './KeyFacts';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
+import TopPriorities from './TopPriorities';
 
 const TABS = [
   { key: 'summary', label: '요점' },
-  { key: 'qa', label: '질문' },
+  { key: 'qa', label: '물어보기' },
   { key: 'evidence', label: '근거' },
   { key: 'check', label: '체크' }
 ];
 
 const INITIAL_CARDS = 3;
 
+const QUICK_QUESTIONS = [
+  '환불 조건이 뭐야?',
+  '돈 내야 하는 부분 알려줘',
+  '내가 해야 할 일이 뭐야?'
+];
+
 function ResultTabs({ result, shortSource, documentText }) {
   const [tab, setTab] = useState('summary');
   const [cardsExpanded, setCardsExpanded] = useState(false);
+  const [quickAsk, setQuickAsk] = useState(null); // { q, seq }
+  const [quickInput, setQuickInput] = useState('');
 
   const cards = Array.isArray(result?.cards) ? result.cards : [];
   const checklist = Array.isArray(result?.checklist) ? result.checklist : [];
@@ -27,6 +36,13 @@ function ResultTabs({ result, shortSource, documentText }) {
   const hasSecurityNotice = Boolean(result?.security_notice)
     || highlights.some((item) => item?.label === '보안 주의');
   const isLongDocument = Boolean(result?.long_document) || Boolean(result?.processing_note);
+
+  const handleQuickAsk = (question) => {
+    const value = (question || '').trim();
+    if (!value) return;
+    setQuickAsk((prev) => ({ q: value, seq: (prev?.seq || 0) + 1 }));
+    setTab('qa');
+  };
 
   return (
     <div className="result-tabs">
@@ -75,12 +91,71 @@ function ResultTabs({ result, shortSource, documentText }) {
         {tab === 'summary' && (
           <>
             <ResultSummary result={result} />
-            <KeyFacts keyFacts={result?.key_facts} previewCount={2} />
-            <SourceHighlights highlights={result?.highlights} initialCount={3} />
+
+            {/* Quick ask — surface the Q&A right under the summary. */}
+            <section className="quick-ask">
+              <p className="quick-ask-title">문요에게 바로 물어보기</p>
+              <div className="quick-ask-row">
+                <input
+                  type="text"
+                  className="quick-ask-input"
+                  placeholder="예: 환불 조건이 뭐야?"
+                  value={quickInput}
+                  onChange={(event) => setQuickInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      handleQuickAsk(quickInput);
+                      setQuickInput('');
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className="primary-button quick-ask-button"
+                  onClick={() => {
+                    handleQuickAsk(quickInput);
+                    setQuickInput('');
+                  }}
+                >
+                  질문
+                </button>
+              </div>
+              <div className="quick-ask-chips">
+                {QUICK_QUESTIONS.map((question) => (
+                  <button
+                    type="button"
+                    key={question}
+                    className="chip qa-chip"
+                    onClick={() => handleQuickAsk(question)}
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <TopPriorities result={result} />
+
+            <KeyFacts keyFacts={result?.key_facts} showCount={false} />
+
+            <SourceHighlights
+              highlights={result?.highlights}
+              initialCount={2}
+              title="주의해서 볼 문장"
+              showCount={false}
+              expandable={false}
+            />
           </>
         )}
 
-        {tab === 'qa' && <DocumentQA documentText={documentText} prominent />}
+        {tab === 'qa' && (
+          <DocumentQA
+            documentText={documentText}
+            prominent
+            initialQuestion={quickAsk?.q || ''}
+            initialSeq={quickAsk?.seq || 0}
+          />
+        )}
 
         {tab === 'evidence' && (
           <>
@@ -94,7 +169,7 @@ function ResultTabs({ result, shortSource, documentText }) {
 
               {cards.length > 0 ? (
                 <>
-                  <div className="card-grid">
+                  <div className="card-grid is-tight">
                     {visibleCards.map((card, index) => (
                       <ResultCard key={`${card.category}-${index}`} card={card} shortSource={shortSource} />
                     ))}

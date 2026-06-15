@@ -592,6 +592,7 @@ button, input, textarea { font: inherit; }
 
 /* ---------- Result cards ---------- */
 .card-grid { display: grid; gap: 12px; }
+.card-grid.is-tight { gap: 9px; }
 
 .result-card {
   border-radius: var(--radius-lg);
@@ -1372,6 +1373,86 @@ button, input, textarea { font: inherit; }
 }
 
 .more-button:hover { background: #e7f1ff; border-color: #bcd6ff; }
+
+/* ---------- Top priorities (먼저 확인할 3가지) ---------- */
+.top-priorities {
+  background: linear-gradient(180deg, #f4f9ff, #ffffff);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.top-priorities-head { margin-bottom: 14px; }
+.top-priorities-title { margin: 0; font-size: 1.18rem; font-weight: 800; color: var(--c-ink); letter-spacing: -0.01em; }
+.top-priorities-hint { margin: 4px 0 0; font-size: 0.9rem; color: var(--c-muted); line-height: 1.5; }
+
+.top-priorities-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.top-priority-item { display: flex; align-items: flex-start; gap: 12px; }
+
+.top-priority-rank {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--grad-brand);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.top-priority-body { min-width: 0; }
+
+.top-priority-label {
+  margin: 2px 0 2px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--c-ink);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.top-priority-emoji { font-size: 1.05rem; line-height: 1; }
+.top-priority-desc { margin: 0; font-size: 0.92rem; color: var(--c-ink-soft); line-height: 1.5; }
+
+/* ---------- Quick ask (result top) ---------- */
+.quick-ask {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  padding: 15px 16px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.quick-ask-title { margin: 0 0 10px; font-size: 1rem; font-weight: 800; color: var(--c-ink); }
+.quick-ask-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+.quick-ask-input {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid #dbe8ff;
+  background: var(--c-surface-2);
+  padding: 11px 13px;
+  font-size: 0.95rem;
+  color: var(--c-ink);
+}
+
+.quick-ask-input:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 4px rgba(43, 127, 255, 0.14);
+}
+
+.quick-ask-button { flex-shrink: 0; padding: 11px 16px; font-size: 0.95rem; }
+.quick-ask-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* ---------- Long document banner ---------- */
 .longdoc-banner {

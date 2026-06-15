@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { askDocument } from '../api/analyze';
 
 const SUGGESTED_QUESTIONS = [
@@ -16,11 +16,12 @@ const CONFIDENCE_META = {
   low: { label: '명확히 찾지 못함', cls: 'low' }
 };
 
-function DocumentQA({ documentText, prominent = false }) {
+function DocumentQA({ documentText, prominent = false, initialQuestion = '', initialSeq = 0 }) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const lastSeqRef = useRef(0);
 
   const runAsk = async (raw) => {
     const query = (raw ?? question).trim();
@@ -47,6 +48,16 @@ function DocumentQA({ documentText, prominent = false }) {
     setQuestion(q);
     runAsk(q);
   };
+
+  // Auto-run a question routed in from the result-top quick-ask box.
+  useEffect(() => {
+    if (initialSeq && initialSeq !== lastSeqRef.current && initialQuestion) {
+      lastSeqRef.current = initialSeq;
+      setQuestion(initialQuestion);
+      runAsk(initialQuestion);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSeq, initialQuestion]);
 
   const confidenceKey = String(answer?.confidence || 'low').toLowerCase();
   const confidence = CONFIDENCE_META[confidenceKey] || CONFIDENCE_META.low;

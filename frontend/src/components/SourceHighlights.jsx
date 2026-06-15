@@ -13,20 +13,26 @@ function severityClass(severity) {
   return 'low';
 }
 
-function SourceHighlights({ highlights, initialCount }) {
+function SourceHighlights({
+  highlights,
+  initialCount,
+  title = '주의 문장 하이라이트',
+  showCount = true,
+  expandable = true
+}) {
   const [expanded, setExpanded] = useState(false);
 
   if (!Array.isArray(highlights) || highlights.length === 0) return null;
 
   const limit = typeof initialCount === 'number' ? initialCount : highlights.length;
   const visible = expanded ? highlights : highlights.slice(0, limit);
-  const hasMore = highlights.length > limit;
+  const hasMore = expandable && highlights.length > limit;
 
   return (
     <section className="result-section">
       <div className="section-title-row">
-        <h3>주의 문장 하이라이트</h3>
-        <span className="count-chip">{highlights.length}</span>
+        <h3>{title}</h3>
+        {showCount && <span className="count-chip">{highlights.length}</span>}
       </div>
 
       <div className="highlight-list">
