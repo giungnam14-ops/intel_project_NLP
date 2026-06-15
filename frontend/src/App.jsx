@@ -41,6 +41,8 @@ function App() {
   const [error, setError] = useState('');
   const [settings, setSettings] = useState(loadSettings);
   const [autoTrigger, setAutoTrigger] = useState(null); // 'file' | 'camera' | null
+  // Bumped to remount DocumentInput (reset its choose/direct/imported state).
+  const [inputKey, setInputKey] = useState(0);
 
   const hasResult = Boolean(result);
 
@@ -94,6 +96,7 @@ function App() {
     setText('');
     setResult(null);
     setError('');
+    setInputKey((key) => key + 1);
   };
 
   // "새 문서 분석하기" — clear the result and return to a fresh input.
@@ -101,6 +104,7 @@ function App() {
     setResult(null);
     setError('');
     setText('');
+    setInputKey((key) => key + 1);
     setTab('analyze');
   };
 
@@ -155,6 +159,7 @@ function App() {
                     </div>
                   )}
                   <DocumentInput
+                    key={inputKey}
                     text={text}
                     setText={setText}
                     loading={loading}

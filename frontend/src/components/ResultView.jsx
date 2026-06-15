@@ -1,9 +1,4 @@
-import Checklist from './Checklist';
-import DocumentQA from './DocumentQA';
-import KeyFacts from './KeyFacts';
-import ResultCard from './ResultCard';
-import ResultSummary from './ResultSummary';
-import SourceHighlights from './SourceHighlights';
+import ResultTabs from './ResultTabs';
 
 function ResultView({ result, shortSource, documentText, onNew }) {
   if (!result) return null;
@@ -16,34 +11,7 @@ function ResultView({ result, shortSource, documentText, onNew }) {
         </button>
       </div>
 
-      <ResultSummary result={result} />
-
-      {/* Additive Stage 1 sections — render only when the optional fields exist. */}
-      <SourceHighlights highlights={result.highlights} />
-      <KeyFacts keyFacts={result.key_facts} />
-
-      {/* Stage 2: ask questions grounded in this document. */}
-      <DocumentQA documentText={documentText} />
-
-      <section className="result-section">
-        <div className="section-title-row">
-          <h3>핵심 카드</h3>
-          <span className="count-chip">{result.cards?.length || 0}</span>
-        </div>
-        <div className="card-grid">
-          {result.cards?.map((card, index) => (
-            <ResultCard key={`${card.category}-${index}`} card={card} shortSource={shortSource} />
-          ))}
-        </div>
-      </section>
-
-      <section className="result-section">
-        <div className="section-title-row">
-          <h3>체크리스트</h3>
-          <span className="count-chip">{result.checklist?.length || 0}</span>
-        </div>
-        <Checklist items={result.checklist || []} />
-      </section>
+      <ResultTabs result={result} shortSource={shortSource} documentText={documentText} />
     </div>
   );
 }

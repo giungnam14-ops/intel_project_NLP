@@ -16,7 +16,7 @@ const CONFIDENCE_META = {
   low: { label: '명확히 찾지 못함', cls: 'low' }
 };
 
-function DocumentQA({ documentText }) {
+function DocumentQA({ documentText, prominent = false }) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -58,6 +58,13 @@ function DocumentQA({ documentText }) {
       <div className="section-title-row">
         <h3>문요에게 물어보기</h3>
       </div>
+
+      {prominent && (
+        <p className="qa-intro">
+          이 문서에서 궁금한 점을 물어보세요.
+          <span className="qa-intro-eg">예: 환불 조건이 뭐야?</span>
+        </p>
+      )}
 
       <div className="qa-input-row">
         <input

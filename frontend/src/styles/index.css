@@ -1200,6 +1200,225 @@ button, input, textarea { font: inherit; }
 .sev-chip.sev-medium { background: #fdefc6; color: #9a6a0d; }
 .sev-chip.sev-low { background: #e3effd; color: #1f6fe0; }
 
+/* ---------- Input: choose mode (how to start) ---------- */
+.import-options { display: grid; gap: 10px; margin-bottom: 16px; }
+
+.option-button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-line);
+  background: linear-gradient(180deg, #fbfdff, #f2f8ff);
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.option-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--c-primary);
+  box-shadow: var(--shadow-soft);
+}
+
+.option-button:disabled { cursor: not-allowed; opacity: 0.6; }
+
+.option-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  font-size: 1.45rem;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  flex-shrink: 0;
+}
+
+.option-text { display: flex; flex-direction: column; gap: 2px; }
+.option-text strong { font-size: 1.04rem; font-weight: 800; color: var(--c-ink); }
+.option-text small { font-size: 0.86rem; color: var(--c-muted); }
+
+/* ---------- Imported document card ---------- */
+.imported-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-line);
+  background: #fff;
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 14px;
+}
+
+.imported-card--review { border-color: #ffd7ce; background: #fffaf8; }
+
+.imported-card-head { display: flex; align-items: flex-start; gap: 13px; }
+
+.imported-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 1.5rem;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  flex-shrink: 0;
+}
+
+.imported-meta { min-width: 0; flex: 1; }
+.imported-eyebrow { margin: 0; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-primary); }
+.imported-name {
+  margin: 2px 0 8px;
+  font-size: 1.06rem;
+  font-weight: 800;
+  color: var(--c-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imported-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.imported-tag {
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink-soft);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.imported-status {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.imported-status-ok { background: #e4f6ec; color: #1f8a52; }
+.imported-status-warn { background: #ffe2db; color: #c0492f; }
+
+.imported-desc { margin: 12px 0 14px; color: var(--c-ink-soft); font-size: 0.94rem; }
+
+.imported-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.imported-actions .primary-button,
+.imported-actions .secondary-button { padding: 12px 14px; font-size: 0.92rem; }
+
+/* ---------- Document preview (paper look) ---------- */
+.doc-preview { margin-bottom: 6px; }
+.doc-preview-title { margin: 0 0 8px; font-size: 0.86rem; font-weight: 800; color: var(--c-muted); }
+
+.doc-preview-paper {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px;
+  max-height: 320px;
+  overflow: hidden;
+}
+
+.doc-preview-paper.is-clamped { max-height: 168px; }
+
+.doc-preview-paper.is-clamped::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff);
+  pointer-events: none;
+}
+
+.doc-preview-text {
+  margin: 0;
+  color: var(--c-ink);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.text-link-button {
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--c-primary-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.text-link-button:hover { text-decoration: underline; }
+
+/* ---------- "더 보기" buttons ---------- */
+.more-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-line);
+  background: var(--c-surface-2);
+  color: var(--c-primary-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.more-button:hover { background: #e7f1ff; border-color: #bcd6ff; }
+
+/* ---------- Result tabs ---------- */
+.result-tabbar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 5px;
+  margin-bottom: 18px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  border-radius: 16px;
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+}
+
+.result-tab {
+  border: none;
+  background: none;
+  border-radius: 12px;
+  padding: 11px 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.result-tab.is-active {
+  background: #fff;
+  color: var(--c-primary-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.result-tab-panel { animation: screenIn 220ms ease both; }
+
+.tab-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed #cdddf6;
+  border-radius: var(--radius-md);
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  text-align: center;
+  font-size: 0.94rem;
+}
+
 /* ---------- Document Q&A (문요에게 물어보기) ---------- */
 .qa-section {
   background: linear-gradient(180deg, #f4f9ff, #ffffff);
@@ -1207,6 +1426,20 @@ button, input, textarea { font: inherit; }
   border-radius: var(--radius-xl);
   padding: 18px 16px;
   box-shadow: var(--shadow-soft);
+}
+
+.qa-intro {
+  margin: 0 0 14px;
+  color: var(--c-ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.qa-intro-eg {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-muted);
+  font-size: 0.9rem;
 }
 
 .qa-input-row { display: flex; gap: 9px; margin-bottom: 12px; }

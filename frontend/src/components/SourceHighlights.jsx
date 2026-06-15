@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const SEVERITY_LABELS = {
   high: '주의 높음',
   medium: '주의',
@@ -11,8 +13,14 @@ function severityClass(severity) {
   return 'low';
 }
 
-function SourceHighlights({ highlights }) {
+function SourceHighlights({ highlights, initialCount }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (!Array.isArray(highlights) || highlights.length === 0) return null;
+
+  const limit = typeof initialCount === 'number' ? initialCount : highlights.length;
+  const visible = expanded ? highlights : highlights.slice(0, limit);
+  const hasMore = highlights.length > limit;
 
   return (
     <section className="result-section">
@@ -22,7 +30,7 @@ function SourceHighlights({ highlights }) {
       </div>
 
       <div className="highlight-list">
-        {highlights.map((highlight, index) => {
+        {visible.map((highlight, index) => {
           const severity = severityClass(highlight?.severity);
           return (
             <article
@@ -41,6 +49,12 @@ function SourceHighlights({ highlights }) {
           );
         })}
       </div>
+
+      {hasMore && (
+        <button type="button" className="more-button" onClick={() => setExpanded((prev) => !prev)}>
+          {expanded ? '접기' : `주의 문장 ${highlights.length - limit}개 더 보기`}
+        </button>
+      )}
     </section>
   );
 }

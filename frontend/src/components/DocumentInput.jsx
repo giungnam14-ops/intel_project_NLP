@@ -3,6 +3,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth/mammoth.browser';
 import Tesseract from 'tesseract.js';
+import DocumentPreview from './DocumentPreview';
+import ImportedDocumentCard from './ImportedDocumentCard';
 
 // Bundle the pdf.js worker locally (works on static hosting without a CDN).
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
@@ -148,6 +150,11 @@ function DocumentInput({
   const cameraInputRef = useRef(null);
   const [importMessage, setImportMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  // mode: 'choose' (pick how to start) | 'direct' (paste/type) | 'imported' (file card)
+  const [mode, setMode] = useState(text ? 'direct' : 'choose');
+  const [docMeta, setDocMeta] = useState(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const lastSourceRef = useRef('file');
 
   const disabled = loading || busy;
 
@@ -157,6 +164,28 @@ function DocumentInput({
 
   const handleCameraClick = () => {
     cameraInputRef.current?.click();
+  };
+
+  const handleReimport = () => {
+    if (lastSourceRef.current === 'camera') {
+      cameraInputRef.current?.click();
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleSelectDirect = () => {
+    setMode('direct');
+    setDocMeta(null);
+    setImportMessage('');
+  };
+
+  const handleExampleClick = (type) => {
+    onExample(type);
+    setMode('direct');
+    setDocMeta(null);
+    setShowEditor(false);
+    setImportMessage('');
   };
 
   // Allow the Home screen to deep-link straight into a file / camera picker.
@@ -171,9 +200,19 @@ function DocumentInput({
     onAutoTriggerHandled?.();
   }, [autoTrigger, onAutoTriggerHandled]);
 
-  const processFile = async (file) => {
+  // Show the imported-document card (and the preview) for an extracted file.
+  const applyImported = (content, meta, openEditor) => {
+    setText(content);
+    setDocMeta({ ...meta, charCount: content.length });
+    setMode('imported');
+    setShowEditor(Boolean(openEditor));
+  };
+
+  const processFile = async (file, source = 'file') => {
+    lastSourceRef.current = source;
     const extension = getExtension(file);
     const imageByMime = isImageFile(file, extension);
+    const fileName = file?.name || (source === 'camera' ? '촬영한 문서' : '가져온 문서');
 
     if (!extension && !imageByMime) {
       setImportMessage('현재 MVP에서는 .txt, .md, .pdf, .docx, 이미지 파일만 지원합니다.');
@@ -194,7 +233,7 @@ function DocumentInput({
           setImportMessage('PDF에서 텍스트를 읽지 못했습니다. 스캔본 PDF는 사진으로 촬영해 OCR 기능을 사용해 주세요.');
           return;
         }
-        setText(extracted);
+        applyImported(extracted, { name: fileName, kind: 'PDF', status: 'extracted' }, false);
         setImportMessage('');
         return;
       }
@@ -212,7 +251,7 @@ function DocumentInput({
           setImportMessage('DOCX 문서에서 텍스트를 읽지 못했습니다.');
           return;
         }
-        setText(extracted);
+        applyImported(extracted, { name: fileName, kind: 'DOCX', status: 'extracted' }, false);
         setImportMessage('');
         return;
       }
@@ -230,9 +269,15 @@ function DocumentInput({
           setImportMessage('사진에서 텍스트를 충분히 인식하지 못했습니다. 밝은 곳에서 문서가 화면에 꽉 차게 다시 촬영해 주세요.');
           return;
         }
-        // Put OCR text into the textarea for review regardless of quality (do not block analysis).
-        setText(recognized);
-        if (isLowQualityOcr(recognized)) {
+        // Keep OCR text available for review regardless of quality (never block analysis).
+        const lowQuality = isLowQualityOcr(recognized);
+        // When OCR confirmation is on (or quality is low) open the editor for review.
+        applyImported(
+          recognized,
+          { name: fileName, kind: '이미지', status: lowQuality ? 'review' : 'ocr' },
+          lowQuality || confirmOcr
+        );
+        if (lowQuality) {
           setImportMessage('OCR 인식 품질이 낮습니다. 문서가 화면에 꽉 차도록 다시 촬영하거나 인식된 문장을 직접 수정해 주세요.');
         } else if (confirmOcr) {
           setImportMessage('사진에서 텍스트를 추출했습니다. 내용을 확인한 뒤 분석하기를 눌러 주세요.');
@@ -244,14 +289,14 @@ function DocumentInput({
 
       // .txt / .md
       const content = await readAsText(file);
-      setText(content);
+      applyImported(content, { name: fileName, kind: '텍스트', status: 'extracted' }, false);
       setImportMessage('');
     } catch {
       setImportMessage('파일을 읽는 중 문제가 발생했습니다.');
     }
   };
 
-  const handleFileChange = async (event) => {
+  const handleFileChange = async (event, source = 'file') => {
     const file = event.target.files?.[0];
     // Reset the input value so selecting the same file again still triggers change.
     event.target.value = '';
@@ -260,86 +305,143 @@ function DocumentInput({
     }
     setBusy(true);
     try {
-      await processFile(file);
+      await processFile(file, source);
     } finally {
       setBusy(false);
     }
   };
+
+  const titleByMode = mode === 'imported'
+    ? '가져온 문서'
+    : mode === 'direct'
+      ? '분석할 문서를 입력하세요'
+      : '어떻게 분석할까요?';
+
+  const showActionBar = mode === 'direct' || mode === 'imported';
+
+  const editor = (
+    <div className="textarea-wrap">
+      <label className="sr-only" htmlFor="document-input">문서 입력</label>
+      <textarea
+        id="document-input"
+        className="input-box"
+        placeholder="분석할 문서를 붙여넣어 주세요."
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+        rows={12}
+        disabled={disabled}
+      />
+      <span className="char-count">{text.length}자</span>
+    </div>
+  );
 
   return (
     <section className="card input-panel">
       <div className="panel-head">
         <div>
           <p className="eyebrow">문서 입력</p>
-          <h2 className="panel-title">분석할 문서를 넣어 주세요</h2>
+          <h2 className="panel-title">{titleByMode}</h2>
         </div>
       </div>
 
-      <span className="group-label">예시로 빠르게 시작</span>
-      <div className="chip-row">
-        <button type="button" className="chip" onClick={() => onExample('terms')}>약관 예시</button>
-        <button type="button" className="chip" onClick={() => onExample('notice')}>공지문 예시</button>
-        <button type="button" className="chip" onClick={() => onExample('paper')}>논문 예시</button>
-      </div>
+      {/* Hidden native inputs — available in every mode. */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".txt,.md,.pdf,.docx,.jpg,.jpeg,.png,.webp"
+        className="sr-only"
+        onChange={(event) => handleFileChange(event, 'file')}
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="sr-only"
+        onChange={(event) => handleFileChange(event, 'camera')}
+      />
 
-      <div className="import-row">
-        <button type="button" className="import-button" onClick={handleImportClick} disabled={disabled}>
-          <span className="import-icon" aria-hidden="true">📁</span>
-          <span>파일 가져오기</span>
-        </button>
-        <button type="button" className="import-button" onClick={handleCameraClick} disabled={disabled}>
-          <span className="import-icon" aria-hidden="true">📷</span>
-          <span>사진 찍어 분석하기</span>
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".txt,.md,.pdf,.docx,.jpg,.jpeg,.png,.webp"
-          className="sr-only"
-          onChange={handleFileChange}
-        />
-        <input
-          ref={cameraInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="sr-only"
-          onChange={handleFileChange}
-        />
-      </div>
+      {mode === 'choose' && (
+        <>
+          <div className="import-options">
+            <button type="button" className="option-button" onClick={handleSelectDirect} disabled={disabled}>
+              <span className="option-icon" aria-hidden="true">✍️</span>
+              <span className="option-text">
+                <strong>직접 입력</strong>
+                <small>문서를 붙여넣어 분석</small>
+              </span>
+            </button>
+            <button type="button" className="option-button" onClick={handleImportClick} disabled={disabled}>
+              <span className="option-icon" aria-hidden="true">📁</span>
+              <span className="option-text">
+                <strong>파일 가져오기</strong>
+                <small>PDF · DOCX · 텍스트 · 이미지</small>
+              </span>
+            </button>
+            <button type="button" className="option-button" onClick={handleCameraClick} disabled={disabled}>
+              <span className="option-icon" aria-hidden="true">📷</span>
+              <span className="option-text">
+                <strong>사진 찍어 분석하기</strong>
+                <small>촬영한 문서를 OCR로 추출</small>
+              </span>
+            </button>
+          </div>
 
-      <label className="sr-only" htmlFor="document-input">문서 입력</label>
-      <div className="textarea-wrap">
-        <textarea
-          id="document-input"
-          className="input-box"
-          placeholder="분석할 문서를 붙여넣어 주세요."
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          rows={12}
-          disabled={disabled}
-        />
-        <span className="char-count">{text.length}자</span>
-      </div>
+          <span className="group-label">또는 예시로 빠르게 시작</span>
+          <div className="chip-row">
+            <button type="button" className="chip" onClick={() => handleExampleClick('terms')}>약관 예시</button>
+            <button type="button" className="chip" onClick={() => handleExampleClick('notice')}>공지문 예시</button>
+            <button type="button" className="chip" onClick={() => handleExampleClick('paper')}>논문 예시</button>
+          </div>
+        </>
+      )}
 
-      <div className="action-bar">
-        <button type="button" className="primary-button" onClick={onAnalyze} disabled={disabled}>
-          {loading ? (
-            <>
-              <span className="btn-spinner" aria-hidden="true" />
-              분석 중입니다…
-            </>
-          ) : (
-            '분석하기'
-          )}
-        </button>
-        <button type="button" className="secondary-button" onClick={onReset} disabled={disabled}>
-          초기화
-        </button>
-      </div>
+      {mode === 'imported' && (
+        <>
+          <ImportedDocumentCard
+            meta={docMeta}
+            editorOpen={showEditor}
+            onToggleEditor={() => setShowEditor((prev) => !prev)}
+            onReimport={handleReimport}
+          />
+          {!showEditor && <DocumentPreview text={text} onViewFull={() => setShowEditor(true)} />}
+          {showEditor && editor}
+        </>
+      )}
+
+      {mode === 'direct' && (
+        <>
+          <div className="chip-row">
+            <button type="button" className="chip" onClick={() => handleExampleClick('terms')}>약관 예시</button>
+            <button type="button" className="chip" onClick={() => handleExampleClick('notice')}>공지문 예시</button>
+            <button type="button" className="chip" onClick={() => handleExampleClick('paper')}>논문 예시</button>
+          </div>
+          {editor}
+        </>
+      )}
+
+      {showActionBar && (
+        <div className="action-bar">
+          <button type="button" className="primary-button" onClick={onAnalyze} disabled={disabled}>
+            {loading ? (
+              <>
+                <span className="btn-spinner" aria-hidden="true" />
+                분석 중입니다…
+              </>
+            ) : (
+              '분석하기'
+            )}
+          </button>
+          <button type="button" className="secondary-button" onClick={onReset} disabled={disabled}>
+            초기화
+          </button>
+        </div>
+      )}
 
       {importMessage && <p className="helper-text helper-strong">{importMessage}</p>}
-      <p className="helper-text">.txt · .md · .pdf · .docx · 이미지 파일을 지원해요. 사진 문서는 OCR로 텍스트를 추출하니, 인식 결과를 확인한 뒤 분석해 주세요.</p>
+      {mode === 'choose' && (
+        <p className="helper-text">.txt · .md · .pdf · .docx · 이미지 파일을 지원해요. 사진 문서는 OCR로 텍스트를 추출합니다.</p>
+      )}
     </section>
   );
 }
