@@ -14,7 +14,7 @@ const STATUS_META = {
 // Matches the backend LONG_DOCUMENT_THRESHOLD (characters).
 const LONG_DOCUMENT_CHARS = 12000;
 
-function ImportedDocumentCard({ meta, editorOpen, onToggleEditor, onReimport }) {
+function ImportedDocumentCard({ meta, editorOpen, onToggleEditor, onReimport, readOnly = false }) {
   if (!meta) return null;
 
   const status = STATUS_META[meta.status] || STATUS_META.extracted;
@@ -44,18 +44,20 @@ function ImportedDocumentCard({ meta, editorOpen, onToggleEditor, onReimport }) 
           : '이 문서에서 분석할 내용을 준비했습니다.'}
       </p>
 
-      <div className="imported-actions">
-        <button
-          type="button"
-          className={status.cls === 'warn' && !editorOpen ? 'primary-button' : 'secondary-button'}
-          onClick={onToggleEditor}
-        >
-          {editorOpen ? '추출 텍스트 접기' : '추출 텍스트 보기/수정'}
-        </button>
-        <button type="button" className="secondary-button" onClick={onReimport}>
-          문서 다시 가져오기
-        </button>
-      </div>
+      {!readOnly && (
+        <div className="imported-actions">
+          <button
+            type="button"
+            className={status.cls === 'warn' && !editorOpen ? 'primary-button' : 'secondary-button'}
+            onClick={onToggleEditor}
+          >
+            {editorOpen ? '추출 텍스트 접기' : '추출 텍스트 보기/수정'}
+          </button>
+          <button type="button" className="secondary-button" onClick={onReimport}>
+            문서 다시 가져오기
+          </button>
+        </div>
+      )}
     </section>
   );
 }

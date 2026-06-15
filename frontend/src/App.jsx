@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { analyzeDocument } from './api/analyze';
 import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
@@ -45,6 +45,10 @@ function App() {
   const [inputKey, setInputKey] = useState(0);
   // Set when the imported document came from low-quality OCR (softens security detection).
   const [ocrLowQuality, setOcrLowQuality] = useState(false);
+  // Imported document metadata (incl. object-URL preview). App owns the URL so
+  // it survives into the result screen; revoked on replace / reset / unmount.
+  const [docMeta, setDocMeta] = useState(null);
+  const previewUrlRef = useRef(null);
 
   const hasResult = Boolean(result);
 
@@ -67,17 +71,40 @@ function App() {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
+  // Revoke any object URL we currently hold for a document preview.
+  const revokePreview = () => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+  };
+
+  const clearDoc = () => {
+    revokePreview();
+    setDocMeta(null);
+    setOcrLowQuality(false);
+  };
+
   const handleExample = (type) => {
     setText(SAMPLE_DOCUMENTS[type]);
     setError('');
     setResult(null);
-    setOcrLowQuality(false);
+    clearDoc();
   };
 
   // DocumentInput reports the imported document's metadata (or null when cleared).
   const handleDocMeta = (meta) => {
+    const nextUrl = meta?.previewUrl || null;
+    if (previewUrlRef.current && previewUrlRef.current !== nextUrl) {
+      URL.revokeObjectURL(previewUrlRef.current);
+    }
+    previewUrlRef.current = nextUrl;
+    setDocMeta(meta || null);
     setOcrLowQuality(meta?.status === 'review');
   };
+
+  // Revoke the held preview URL when the app unmounts.
+  useEffect(() => revokePreview, []);
 
   const handleAnalyze = async () => {
     if (!text.trim()) {
@@ -104,7 +131,7 @@ function App() {
     setText('');
     setResult(null);
     setError('');
-    setOcrLowQuality(false);
+    clearDoc();
     setInputKey((key) => key + 1);
   };
 
@@ -113,7 +140,7 @@ function App() {
     setResult(null);
     setError('');
     setText('');
-    setOcrLowQuality(false);
+    clearDoc();
     setInputKey((key) => key + 1);
     setTab('analyze');
   };
@@ -158,6 +185,7 @@ function App() {
                   result={result}
                   shortSource={settings.shortSource}
                   documentText={text}
+                  documentMeta={docMeta}
                   onNew={handleNewAnalysis}
                 />
               ) : (

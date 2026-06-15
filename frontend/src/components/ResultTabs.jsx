@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ConfirmChecklist from './ConfirmChecklist';
+import DocumentPreview from './DocumentPreview';
 import DocumentQA from './DocumentQA';
+import ImportedDocumentCard from './ImportedDocumentCard';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
@@ -9,6 +11,7 @@ import TopPriorities from './TopPriorities';
 const TABS = [
   { key: 'summary', label: '요점' },
   { key: 'qa', label: '물어보기' },
+  { key: 'document', label: '문서' },
   { key: 'evidence', label: '근거' },
   { key: 'check', label: '체크' }
 ];
@@ -22,7 +25,7 @@ const QUICK_QUESTIONS = [
   '근거 문장 보여줘'
 ];
 
-function ResultTabs({ result, shortSource, documentText }) {
+function ResultTabs({ result, shortSource, documentText, documentMeta }) {
   const [tab, setTab] = useState('summary');
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const [quickAsk, setQuickAsk] = useState(null); // { q, seq }
@@ -68,6 +71,22 @@ function ResultTabs({ result, shortSource, documentText }) {
               문서 내용 자체는 계속 분석했지만, 해당 문장은 보안 주의 문장으로 표시했어요.
             </p>
           </div>
+        </div>
+      )}
+
+      {(documentMeta || documentText) && (
+        <div className="result-docbar">
+          <div className="result-docbar-info">
+            <span className="result-docbar-eyebrow">분석한 문서</span>
+            <span className="result-docbar-name">{documentMeta?.name || '직접 입력한 문서'}</span>
+            <span className="result-docbar-tags">
+              {isLongDocument && <span className="mini-tag">긴 문서</span>}
+              {documentMeta?.status === 'review' && <span className="mini-tag warn">OCR 확인 필요</span>}
+            </span>
+          </div>
+          <button type="button" className="result-docbar-button" onClick={() => setTab('document')}>
+            문서 보기
+          </button>
         </div>
       )}
 
@@ -160,6 +179,22 @@ function ResultTabs({ result, shortSource, documentText }) {
             initialQuestion={quickAsk?.q || ''}
             initialSeq={quickAsk?.seq || 0}
           />
+        )}
+
+        {tab === 'document' && (
+          <section className="result-section">
+            {documentMeta ? (
+              <>
+                <ImportedDocumentCard meta={documentMeta} readOnly />
+                <DocumentPreview meta={documentMeta} text={documentText} readOnly />
+              </>
+            ) : documentText ? (
+              <DocumentPreview meta={null} text={documentText} readOnly />
+            ) : (
+              <p className="tab-empty">표시할 문서가 없습니다.</p>
+            )}
+            <p className="tab-help">다시 분석하려면 분석 탭에서 문서를 수정해 주세요.</p>
+          </section>
         )}
 
         {tab === 'evidence' && (

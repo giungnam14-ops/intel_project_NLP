@@ -1,6 +1,6 @@
 import ResultTabs from './ResultTabs';
 
-function ResultView({ result, shortSource, documentText, onNew }) {
+function ResultView({ result, shortSource, documentText, documentMeta, onNew }) {
   if (!result) return null;
 
   return (
@@ -11,7 +11,12 @@ function ResultView({ result, shortSource, documentText, onNew }) {
         </button>
       </div>
 
-      <ResultTabs result={result} shortSource={shortSource} documentText={documentText} />
+      <ResultTabs
+        result={result}
+        shortSource={shortSource}
+        documentText={documentText}
+        documentMeta={documentMeta}
+      />
     </div>
   );
 }

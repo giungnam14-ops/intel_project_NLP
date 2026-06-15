@@ -238,7 +238,11 @@ function DocumentInput({
           setImportMessage('PDF에서 텍스트를 읽지 못했습니다. 스캔본 PDF는 사진으로 촬영해 OCR 기능을 사용해 주세요.');
           return;
         }
-        applyImported(extracted, { name: fileName, kind: 'PDF', status: 'extracted' }, false);
+        applyImported(
+          extracted,
+          { name: fileName, kind: 'PDF', status: 'extracted', previewUrl: URL.createObjectURL(file), previewKind: 'pdf' },
+          false
+        );
         setImportMessage('');
         return;
       }
@@ -256,7 +260,11 @@ function DocumentInput({
           setImportMessage('DOCX 문서에서 텍스트를 읽지 못했습니다.');
           return;
         }
-        applyImported(extracted, { name: fileName, kind: 'DOCX', status: 'extracted' }, false);
+        applyImported(
+          extracted,
+          { name: fileName, kind: 'DOCX', status: 'extracted', previewUrl: null, previewKind: 'docx' },
+          false
+        );
         setImportMessage('');
         return;
       }
@@ -279,7 +287,13 @@ function DocumentInput({
         // When OCR confirmation is on (or quality is low) open the editor for review.
         applyImported(
           recognized,
-          { name: fileName, kind: '이미지', status: lowQuality ? 'review' : 'ocr' },
+          {
+            name: fileName,
+            kind: '이미지',
+            status: lowQuality ? 'review' : 'ocr',
+            previewUrl: URL.createObjectURL(file),
+            previewKind: 'image'
+          },
           lowQuality || confirmOcr
         );
         if (lowQuality) {
@@ -294,7 +308,11 @@ function DocumentInput({
 
       // .txt / .md
       const content = await readAsText(file);
-      applyImported(content, { name: fileName, kind: '텍스트', status: 'extracted' }, false);
+      applyImported(
+        content,
+        { name: fileName, kind: '텍스트', status: 'extracted', previewUrl: null, previewKind: 'text' },
+        false
+      );
       setImportMessage('');
     } catch {
       setImportMessage('파일을 읽는 중 문제가 발생했습니다.');
@@ -412,7 +430,7 @@ function DocumentInput({
             onToggleEditor={() => setShowEditor((prev) => !prev)}
             onReimport={handleReimport}
           />
-          {!showEditor && <DocumentPreview text={text} onViewFull={() => setShowEditor(true)} />}
+          {!showEditor && <DocumentPreview meta={docMeta} text={text} onViewFull={() => setShowEditor(true)} />}
           {showEditor && editor}
         </>
       )}
