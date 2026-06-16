@@ -15,16 +15,30 @@ PAPER_KEYWORDS = [
     "연구", "방법", "결과", "실험", "데이터", "분석", "한계", "제안", "논문",
     "보고서", "목적", "성능", "모델", "문제"
 ]
+# Distinctive contract / agreement vocabulary. Bare "갑"/"을"/"원" are excluded
+# on purpose (too common as substrings) to avoid false positives.
+CONTRACT_KEYWORDS = [
+    "계약서", "계약", "약정", "임대인", "임차인", "매도인", "매수인", "계약금",
+    "중도금", "잔금", "보증금", "월세", "임대차", "임대차계약", "목적물", "특약",
+    "계약기간", "계약 기간", "해제", "위약금", "손해배상", "날인", "갑과 을"
+]
+# Filename hints that strongly imply a contract was uploaded.
+_CONTRACT_FILENAME_HINTS = ["계약서", "약정서", "임대차", "약정", "계약"]
 
 
-def classify_document(text: str) -> str:
-    """Return the most likely document type based on keyword frequency."""
+def classify_document(text: str, filename: str = "") -> str:
+    """Return the most likely document type based on keyword frequency.
+
+    ``filename`` is optional; when it looks like a contract it strongly boosts
+    the contract score. Backward compatible: callers may omit it.
+    """
     lowered = text.lower()
 
     scores = {
         "terms": 0,
         "notice": 0,
         "paper": 0,
+        "contract": 0,
     }
 
     for keyword in TERMS_KEYWORDS:
@@ -36,6 +50,14 @@ def classify_document(text: str) -> str:
     for keyword in PAPER_KEYWORDS:
         if keyword.lower() in lowered:
             scores["paper"] += 1
+    for keyword in CONTRACT_KEYWORDS:
+        if keyword.lower() in lowered:
+            scores["contract"] += 1
+
+    # A contract-looking filename is a strong signal the user uploaded a contract.
+    fname = (filename or "")
+    if any(hint in fname for hint in _CONTRACT_FILENAME_HINTS):
+        scores["contract"] += 5
 
     best_type = max(scores, key=scores.get)
     if scores[best_type] == 0:

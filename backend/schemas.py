@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class AnalyzeRequest(BaseModel):
     text: str
     document_type: str = "auto"
+    filename: str = ""
     # Hint from the client: text came from low-quality OCR, so soften security
     # detection (optional, backward compatible).
     ocr_low_quality: bool = False

@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
-export async function analyzeDocument(text, ocrLowQuality = false) {
+export async function analyzeDocument(text, ocrLowQuality = false, filename = '') {
   const response = await fetch(`${API_BASE_URL}/analyze`, {
     method: 'POST',
     headers: {
@@ -9,7 +9,8 @@ export async function analyzeDocument(text, ocrLowQuality = false) {
     body: JSON.stringify({
       text,
       document_type: 'auto',
-      ocr_low_quality: Boolean(ocrLowQuality)
+      ocr_low_quality: Boolean(ocrLowQuality),
+      filename: filename || ''
     })
   });
 

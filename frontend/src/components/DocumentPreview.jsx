@@ -1,4 +1,79 @@
+import { useEffect, useRef, useState } from 'react';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+// Reuse the locally-bundled pdf.js worker (same as DocumentInput). Idempotent.
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+
 const PREVIEW_THRESHOLD = 180;
+
+// Render the first page of a PDF (by object URL) onto a canvas. This avoids the
+// blank <object>/<iframe> behavior some browsers show for blob: PDFs.
+function PdfCanvasPreview({ url }) {
+  const canvasRef = useRef(null);
+  const [state, setState] = useState('loading'); // loading | done | error
+
+  useEffect(() => {
+    if (!url) {
+      setState('error');
+      return undefined;
+    }
+
+    let cancelled = false;
+    let task;
+    setState('loading');
+
+    (async () => {
+      try {
+        task = pdfjsLib.getDocument(url);
+        const pdf = await task.promise;
+        const page = await pdf.getPage(1);
+        if (cancelled) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const base = page.getViewport({ scale: 1 });
+        const targetWidth = canvas.parentElement?.clientWidth || 320;
+        const scale = Math.min(2, Math.max(0.5, targetWidth / base.width));
+        const viewport = page.getViewport({ scale });
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        if (!cancelled) setState('done');
+      } catch {
+        if (!cancelled) setState('error');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        task?.destroy?.();
+      } catch {
+        // ignore teardown errors
+      }
+    };
+  }, [url]);
+
+  return (
+    <div className="doc-preview-pdfwrap">
+      <canvas
+        ref={canvasRef}
+        className="doc-preview-canvas"
+        style={{ display: state === 'done' ? 'block' : 'none' }}
+      />
+      {state === 'loading' && <p className="doc-preview-status">PDF 미리보기를 불러오는 중…</p>}
+      {state === 'error' && (
+        <p className="doc-preview-status">
+          이 브라우저에서는 PDF 미리보기를 바로 표시하기 어려워요. 새 탭에서 원본을 열어 확인해 주세요.
+        </p>
+      )}
+    </div>
+  );
+}
 
 const TITLES = {
   pdf: 'PDF 원본 미리보기',
@@ -22,14 +97,12 @@ function DocumentPreview({ meta, text, onViewFull, readOnly = false }) {
   const value = (text || '').trim();
   const isLong = value.length > PREVIEW_THRESHOLD;
 
-  // PDF — embed the original file.
+  // PDF — render the first page to a canvas (object/iframe can render blank).
   if (kind === 'pdf' && url) {
     return (
       <section className="doc-preview">
         <p className="doc-preview-title">{TITLES.pdf}</p>
-        <object data={url} type="application/pdf" className="doc-preview-pdf" aria-label="PDF 원본 미리보기">
-          <iframe title="PDF 원본 미리보기" src={url} className="doc-preview-pdf" />
-        </object>
+        <PdfCanvasPreview url={url} />
         <a className="text-link-button" href={url} target="_blank" rel="noreferrer">새 탭에서 원본 열기</a>
         <PrivacyNote />
       </section>

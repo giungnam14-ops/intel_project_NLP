@@ -117,7 +117,7 @@ function App() {
     setLoading(true);
 
     try {
-      const data = await analyzeDocument(text, ocrLowQuality);
+      const data = await analyzeDocument(text, ocrLowQuality, docMeta?.name || '');
       setResult(data);
     } catch (err) {
       setResult(null);

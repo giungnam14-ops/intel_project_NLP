@@ -18,6 +18,14 @@ const TABS = [
 
 const INITIAL_CARDS = 3;
 
+// Friendly badge per document type. "기타"/blocked are intentionally hidden.
+const TYPE_BADGE = {
+  contract: '계약서',
+  terms: '약관',
+  notice: '공지문',
+  paper: '논문'
+};
+
 const QUICK_QUESTIONS = [
   '돈 내야 하는 부분 알려줘',
   '내가 해야 할 일 알려줘',
@@ -80,6 +88,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
             <span className="result-docbar-eyebrow">분석한 문서</span>
             <span className="result-docbar-name">{documentMeta?.name || '직접 입력한 문서'}</span>
             <span className="result-docbar-tags">
+              {TYPE_BADGE[result?.document_type] && (
+                <span className="mini-tag type">{TYPE_BADGE[result.document_type]}</span>
+              )}
               {isLongDocument && <span className="mini-tag">긴 문서</span>}
               {documentMeta?.status === 'review' && <span className="mini-tag warn">OCR 확인 필요</span>}
             </span>

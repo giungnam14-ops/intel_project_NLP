@@ -63,11 +63,46 @@ const THEMES = {
     desc: '불리한 조건이 있을 수 있어요.',
     why: '불리하게 작용할 수 있는 조건이 있는지 확인하세요.'
   },
+  special: {
+    emoji: '📌',
+    title: '특약 사항을 확인하세요',
+    desc: '특별한 약속이 있을 수 있어요.',
+    why: '일반 조건과 다른 특별한 약속(특약)이 있는지 확인하세요.'
+  },
   default: {
     emoji: '⭐',
     title: '문서에서 꼭 확인할 내용이에요',
     desc: '핵심 조건을 확인하세요.',
     why: '문서의 핵심 조건을 확인하세요.'
+  }
+};
+
+// Contract documents get clearer, contract-specific copy per theme.
+const CONTRACT_OVERRIDES = {
+  money: {
+    title: '금액 조건을 확인하세요',
+    desc: '계약금·잔금·보증금 등 돈 조건이 있어요.',
+    why: '계약금, 잔금, 보증금, 수수료처럼 돈과 관련된 조건이 있는지 확인하세요.'
+  },
+  date: {
+    title: '계약 기간을 확인하세요',
+    desc: '시작일·종료일·갱신 조건이 있어요.',
+    why: '계약 시작일, 종료일, 갱신 조건을 확인하세요.'
+  },
+  cancel: {
+    title: '해지/위약 조건을 확인하세요',
+    desc: '해지 시 불이익이 있을 수 있어요.',
+    why: '계약을 해지할 때 불이익이나 위약금이 있는지 확인하세요.'
+  },
+  refund: {
+    title: '해지/위약 조건을 확인하세요',
+    desc: '해지 시 불이익이 있을 수 있어요.',
+    why: '계약을 해지할 때 불이익이나 위약금이 있는지 확인하세요.'
+  },
+  action: {
+    title: '서명/날인이 필요해요',
+    desc: '직접 처리해야 할 항목이 있어요.',
+    why: '계약 효력을 위해 서명·날인처럼 직접 처리해야 할 항목이 있을 수 있어요.'
   }
 };
 
@@ -84,8 +119,9 @@ const NUMBERY_RE = /[0-9]/;
 // Map a piece of evidence text to a friendly theme key.
 function classifyTheme(text, tag) {
   const value = String(text || '');
+  if (/특약|별도 약정/.test(value)) return 'special';
   if (/환불/.test(value)) return 'refund';
-  if (/해지|탈회|탈퇴|취소/.test(value)) return 'cancel';
+  if (/해지|탈회|탈퇴|취소|위약금|손해배상/.test(value)) return 'cancel';
   if (/개인정보|제3자|제 3자/.test(value)) return 'privacy';
   if (/위약금|수수료|결제|자동결제|비용|금액|요금|원|%/.test(value)) return 'money';
   if (/책임|면책|손해|배상/.test(value)) return 'liability';
@@ -156,6 +192,7 @@ function gatherCandidates(result) {
 // Produce up to 3 friendly priority items, deduped by theme.
 function pickTop(result) {
   const candidates = gatherCandidates(result);
+  const isContract = result?.document_type === 'contract';
   const items = [];
   const seenThemes = new Set();
 
@@ -165,15 +202,19 @@ function pickTop(result) {
     if (seenThemes.has(themeKey)) continue;
     seenThemes.add(themeKey);
 
-    const theme = THEMES[themeKey] || THEMES.default;
+    const base = THEMES[themeKey] || THEMES.default;
+    const theme = isContract && CONTRACT_OVERRIDES[themeKey]
+      ? { ...base, ...CONTRACT_OVERRIDES[themeKey] }
+      : base;
+
     let why = theme.why;
-    if (themeKey === 'money' && NUMBERY_RE.test(String(candidate.value || ''))) {
+    if (themeKey === 'money' && !isContract && NUMBERY_RE.test(String(candidate.value || ''))) {
       why = `${candidate.value}처럼 ${theme.why}`;
     }
 
     items.push({
       themeKey,
-      emoji: theme.emoji,
+      emoji: base.emoji,
       title: theme.title,
       desc: theme.desc,
       why,

@@ -30,6 +30,14 @@ CATEGORY_KEYWORDS = {
         "한계점": ["한계", "제한점", "부족"],
         "활용 가능성": ["활용", "적용", "제안"],
     },
+    "contract": {
+        "금액 조건": ["계약금", "중도금", "잔금", "보증금", "월세", "대금", "금액", "수수료", "위약금"],
+        "계약 기간": ["계약기간", "계약 기간", "임대차", "시작일", "종료일", "갱신", "개시"],
+        "해지/위약": ["해지", "해제", "위약금", "손해배상", "중도해지", "중도 해지"],
+        "특약 사항": ["특약", "별도 약정", "단서"],
+        "서명/날인": ["서명", "날인", "인감", "기명"],
+        "개인정보 제공": ["개인정보", "제3자"],
+    },
 }
 
 
@@ -50,7 +58,7 @@ def extract_items(text: str, document_type: str) -> list[dict]:
         lowered = sentence.lower()
         for category, keywords in config.items():
             if any(keyword.lower() in lowered for keyword in keywords):
-                level = "높음" if category in {"자동결제", "환불 제한", "개인정보 제공", "해지 조건", "책임 제한"} else "보통"
+                level = "높음" if category in {"자동결제", "환불 제한", "개인정보 제공", "해지 조건", "책임 제한", "금액 조건", "해지/위약"} else "보통"
                 items.append(
                     {
                         "category": category,

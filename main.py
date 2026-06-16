@@ -51,7 +51,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
 
     result = apply_guardrails(
         request.text,
-        analyze_document,
+        lambda document_text: analyze_document(document_text, filename=request.filename or ""),
         ocr_low_quality=request.ocr_low_quality,
     )
 
