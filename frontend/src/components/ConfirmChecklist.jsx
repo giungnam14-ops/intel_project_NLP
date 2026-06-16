@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buildEvidence } from '../utils/evidence';
 
 // Simple, action-oriented "confirm before you agree/proceed" lists by doc type.
 const TYPE_ITEMS = {
@@ -93,24 +94,36 @@ function ConfirmChecklist({ result, onShowInDocument }) {
                   {isOpen ? '접기' : '설명'}
                 </button>
               </div>
-              {isOpen && (
-                <div className="confirm-detail">
-                  <p className="confirm-detail-text">
-                    {row.evidence
-                      ? `“${row.evidence}”`
-                      : '관련 내용을 근거 탭에서 확인해 보세요.'}
-                  </p>
-                  {onShowInDocument && row.evidence && (
-                    <button
-                      type="button"
-                      className="evidence-link"
-                      onClick={() => onShowInDocument({ title: row.label, text: row.evidence, source: row.evidence })}
-                    >
-                      문서에서 보기
-                    </button>
-                  )}
-                </div>
-              )}
+              {isOpen && (() => {
+                const evidence = buildEvidence(row.evidence);
+                const isGood = evidence.quality === 'good' && Boolean(evidence.cleaned);
+                return (
+                  <div className="confirm-detail">
+                    {row.evidence && isGood ? (
+                      <p className="confirm-detail-text">“{evidence.cleaned}”</p>
+                    ) : row.evidence ? (
+                      <p className="confirm-detail-text">근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.</p>
+                    ) : (
+                      <p className="confirm-detail-text">관련 내용을 근거 탭에서 확인해 보세요.</p>
+                    )}
+                    {onShowInDocument && row.evidence && (
+                      <button
+                        type="button"
+                        className="evidence-link"
+                        onClick={() => onShowInDocument({
+                          title: row.label,
+                          text: isGood ? evidence.cleaned : '',
+                          rawTextForMatch: evidence.raw,
+                          source: isGood ? evidence.cleaned : evidence.raw,
+                          quality: isGood ? 'good' : 'low'
+                        })}
+                      >
+                        문서에서 보기
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
             </li>
           );
         })}

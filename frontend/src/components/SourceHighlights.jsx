@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buildEvidence } from '../utils/evidence';
 
 const SEVERITY_LABELS = {
   high: '주의 높음',
@@ -22,6 +23,7 @@ function SourceHighlights({
   onShowInDocument
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [rawOpen, setRawOpen] = useState({});
 
   if (!Array.isArray(highlights) || highlights.length === 0) return null;
 
@@ -39,6 +41,9 @@ function SourceHighlights({
       <div className="highlight-list">
         {visible.map((highlight, index) => {
           const severity = severityClass(highlight?.severity);
+          const evidence = buildEvidence(highlight?.source_text);
+          const isGood = evidence.quality === 'good' && Boolean(evidence.cleaned);
+          const showRaw = rawOpen[index];
           return (
             <article
               className={`highlight-card sev-${severity}`}
@@ -48,15 +53,42 @@ function SourceHighlights({
                 <span className="highlight-label">{highlight?.label}</span>
                 <span className={`sev-chip sev-${severity}`}>{SEVERITY_LABELS[severity]}</span>
               </div>
-              {highlight?.source_text && (
-                <p className="highlight-source">“{highlight.source_text}”</p>
+
+              {isGood ? (
+                <>
+                  <p className="highlight-source">“{evidence.cleaned}”</p>
+                  {highlight?.reason && <p className="highlight-reason">{highlight.reason}</p>}
+                  {evidence.raw.length > evidence.cleaned.length && (
+                    <button
+                      type="button"
+                      className="evidence-rawtoggle"
+                      onClick={() => setRawOpen((prev) => ({ ...prev, [index]: !prev[index] }))}
+                    >
+                      {showRaw ? '원문 접기' : '원문 일부 보기'}
+                    </button>
+                  )}
+                  {showRaw && <p className="highlight-rawtext">{evidence.raw}</p>}
+                </>
+              ) : (
+                <div className="evidence-lowq">
+                  <p className="evidence-lowq-title">근거 문장을 정확히 찾기 어려워요</p>
+                  <p className="evidence-lowq-desc">
+                    PDF에서 추출된 텍스트가 일부 깨져 있어요. 원본 문서나 추출 텍스트를 확인해 주세요.
+                  </p>
+                </div>
               )}
-              {highlight?.reason && <p className="highlight-reason">{highlight.reason}</p>}
+
               {onShowInDocument && highlight?.source_text && (
                 <button
                   type="button"
                   className="evidence-link"
-                  onClick={() => onShowInDocument({ title: highlight.label, text: highlight.source_text, source: highlight.source_text })}
+                  onClick={() => onShowInDocument({
+                    title: highlight.label,
+                    text: isGood ? evidence.cleaned : '',
+                    rawTextForMatch: evidence.raw,
+                    source: isGood ? evidence.cleaned : evidence.raw,
+                    quality: isGood ? 'good' : 'low'
+                  })}
                 >
                   문서에서 보기
                 </button>

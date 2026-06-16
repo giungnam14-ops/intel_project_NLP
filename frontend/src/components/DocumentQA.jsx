@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { askDocument } from '../api/analyze';
+import { buildEvidence } from '../utils/evidence';
 
 const SUGGESTED_QUESTIONS = [
   '돈 내야 하는 부분만 알려줘',
@@ -127,21 +128,35 @@ function DocumentQA({ documentText, prominent = false, initialQuestion = '', ini
           {evidence.length > 0 ? (
             <div className="qa-evidence">
               <p className="qa-evidence-title">근거 문장</p>
-              {evidence.map((item, index) => (
-                <article className="qa-evidence-card" key={index}>
-                  {item?.label && <span className="qa-evidence-label">{item.label}</span>}
-                  <p>{item?.source_text}</p>
-                  {onShowInDocument && item?.source_text && (
-                    <button
-                      type="button"
-                      className="evidence-link"
-                      onClick={() => onShowInDocument({ title: item.label, text: item.source_text, source: item.source_text })}
-                    >
-                      문서에서 보기
-                    </button>
-                  )}
-                </article>
-              ))}
+              {evidence.map((item, index) => {
+                const ev = buildEvidence(item?.source_text);
+                const isGood = ev.quality === 'good' && Boolean(ev.cleaned);
+                return (
+                  <article className="qa-evidence-card" key={index}>
+                    {item?.label && <span className="qa-evidence-label">{item.label}</span>}
+                    {isGood ? (
+                      <p>{ev.cleaned}</p>
+                    ) : (
+                      <p className="qa-evidence-lowq">근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.</p>
+                    )}
+                    {onShowInDocument && item?.source_text && (
+                      <button
+                        type="button"
+                        className="evidence-link"
+                        onClick={() => onShowInDocument({
+                          title: item.label,
+                          text: isGood ? ev.cleaned : '',
+                          rawTextForMatch: ev.raw,
+                          source: isGood ? ev.cleaned : ev.raw,
+                          quality: isGood ? 'good' : 'low'
+                        })}
+                      >
+                        문서에서 보기
+                      </button>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <p className="qa-evidence-empty">근거 문장을 찾지 못했습니다.</p>

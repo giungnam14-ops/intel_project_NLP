@@ -8,6 +8,7 @@ import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
 import TopPriorities from './TopPriorities';
+import { isDocumentNoisy } from '../utils/evidence';
 
 const TABS = [
   { key: 'summary', label: '요점' },
@@ -63,6 +64,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
   const hasSecurityNotice = Boolean(result?.security_notice)
     || highlights.some((item) => item?.label === '보안 주의');
   const isLongDocument = Boolean(result?.long_document) || Boolean(result?.processing_note);
+  const noisyDocument = isDocumentNoisy(documentText);
 
   const handleQuickAsk = (question) => {
     const value = (question || '').trim();
@@ -83,6 +85,15 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
                 || '문서 전체를 한 번에 보여주기보다, 핵심 문장과 주의 표현을 중심으로 요약했습니다.'}
             </p>
           </div>
+        </div>
+      )}
+
+      {noisyDocument && (
+        <div className="noisy-banner" role="status">
+          <span className="noisy-banner-icon" aria-hidden="true">⚠️</span>
+          <p className="noisy-banner-text">
+            PDF 텍스트가 일부 깨져 정확도가 낮을 수 있어요. 원본 문서와 함께 확인해 주세요.
+          </p>
         </div>
       )}
 

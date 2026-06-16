@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buildEvidence } from '../utils/evidence';
 
 // Friendly, sentence-style copy per theme. Titles read as plain sentences so a
 // first-time user understands them without knowing the internal keywords.
@@ -189,38 +190,50 @@ function gatherCandidates(result) {
   return candidates;
 }
 
-// Produce up to 3 friendly priority items, deduped by theme.
+// Produce up to 3 friendly priority items, deduped by theme. Good-quality
+// evidence is preferred; low-quality (broken PDF/OCR) evidence is softened.
 function pickTop(result) {
   const candidates = gatherCandidates(result);
   const isContract = result?.document_type === 'contract';
   const items = [];
   const seenThemes = new Set();
 
-  for (const candidate of candidates) {
-    if (items.length >= 3) break;
-    const themeKey = classifyTheme(candidate.text, candidate.tag);
-    if (seenThemes.has(themeKey)) continue;
-    seenThemes.add(themeKey);
+  const consider = (preferGood) => {
+    for (const candidate of candidates) {
+      if (items.length >= 3) break;
+      const themeKey = classifyTheme(candidate.text, candidate.tag);
+      if (seenThemes.has(themeKey)) continue;
 
-    const base = THEMES[themeKey] || THEMES.default;
-    const theme = isContract && CONTRACT_OVERRIDES[themeKey]
-      ? { ...base, ...CONTRACT_OVERRIDES[themeKey] }
-      : base;
+      const evidence = buildEvidence(candidate.source);
+      const isGood = evidence.quality === 'good' && Boolean(evidence.cleaned);
+      if (preferGood && !isGood) continue;
 
-    let why = theme.why;
-    if (themeKey === 'money' && !isContract && NUMBERY_RE.test(String(candidate.value || ''))) {
-      why = `${candidate.value}처럼 ${theme.why}`;
+      seenThemes.add(themeKey);
+      const base = THEMES[themeKey] || THEMES.default;
+      const theme = isContract && CONTRACT_OVERRIDES[themeKey]
+        ? { ...base, ...CONTRACT_OVERRIDES[themeKey] }
+        : base;
+
+      let why = theme.why;
+      if (isGood && themeKey === 'money' && !isContract && NUMBERY_RE.test(String(candidate.value || ''))) {
+        why = `${candidate.value}처럼 ${theme.why}`;
+      }
+
+      items.push({
+        themeKey,
+        emoji: base.emoji,
+        title: theme.title,
+        desc: isGood ? theme.desc : '근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.',
+        why: isGood ? why : `${theme.why} 다만 근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.`,
+        cleaned: evidence.cleaned,
+        raw: evidence.raw,
+        quality: isGood ? 'good' : 'low'
+      });
     }
+  };
 
-    items.push({
-      themeKey,
-      emoji: base.emoji,
-      title: theme.title,
-      desc: theme.desc,
-      why,
-      source: candidate.source || ''
-    });
-  }
+  consider(true);
+  if (items.length < 3) consider(false);
 
   return items;
 }
@@ -280,20 +293,48 @@ function TopPriorities({ result, onShowInDocument }) {
                 <div className="top-priority-detail">
                   <p className="top-priority-detail-label">왜 중요해요</p>
                   <p className="top-priority-why">{item.why}</p>
-                  {item.source ? (
+                  {item.quality === 'good' && item.cleaned ? (
                     <>
                       <p className="top-priority-detail-label">근거 문장</p>
-                      <p className="top-priority-source">“{item.source}”</p>
+                      <p className="top-priority-source">“{item.cleaned}”</p>
                       {onShowInDocument && (
                         <button
                           type="button"
                           className="evidence-link"
-                          onClick={() => onShowInDocument({ title: item.title, text: item.source, source: item.source })}
+                          onClick={() => onShowInDocument({
+                            title: item.title,
+                            text: item.cleaned,
+                            rawTextForMatch: item.raw,
+                            source: item.cleaned,
+                            quality: 'good'
+                          })}
                         >
                           문서에서 보기
                         </button>
                       )}
                     </>
+                  ) : item.raw ? (
+                    <div className="evidence-lowq">
+                      <p className="evidence-lowq-title">근거 문장을 정확히 찾기 어려워요</p>
+                      <p className="evidence-lowq-desc">
+                        PDF에서 추출된 텍스트가 일부 깨져 있어요. 원본 문서나 추출 텍스트를 확인해 주세요.
+                      </p>
+                      {onShowInDocument && (
+                        <button
+                          type="button"
+                          className="evidence-link"
+                          onClick={() => onShowInDocument({
+                            title: item.title,
+                            text: '',
+                            rawTextForMatch: item.raw,
+                            source: item.raw,
+                            quality: 'low'
+                          })}
+                        >
+                          문서에서 보기
+                        </button>
+                      )}
+                    </div>
                   ) : (
                     <p className="top-priority-source muted">관련 내용을 근거 탭에서 확인해 보세요.</p>
                   )}
