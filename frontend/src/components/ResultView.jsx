@@ -1,6 +1,18 @@
+import ResultFeedback from './ResultFeedback';
 import ResultTabs from './ResultTabs';
 
-function ResultView({ result, shortSource, documentText, documentMeta, savedView = false, analysisMode = 'quick', isSample = false, onNew }) {
+function ResultView({
+  result,
+  shortSource,
+  documentText,
+  documentMeta,
+  savedView = false,
+  analysisMode = 'quick',
+  isSample = false,
+  resultId = null,
+  onFeedbackSaved,
+  onNew
+}) {
   if (!result) return null;
 
   return (
@@ -24,6 +36,14 @@ function ResultView({ result, shortSource, documentText, documentMeta, savedView
         documentText={documentText}
         documentMeta={documentMeta}
         analysisMode={analysisMode}
+      />
+
+      <ResultFeedback
+        key={resultId || 'feedback'}
+        resultId={resultId}
+        documentType={result?.document_type}
+        analysisMode={analysisMode}
+        onSaved={onFeedbackSaved}
       />
     </div>
   );

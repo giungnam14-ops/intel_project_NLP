@@ -19,7 +19,7 @@ function SettingToggle({ label, desc, checked, onChange }) {
   );
 }
 
-function SettingsScreen({ settings, onChange, historyCount = 0, onClearHistory }) {
+function SettingsScreen({ settings, onChange, historyCount = 0, onClearHistory, feedbackCount = 0, onClearFeedback }) {
   return (
     <div className="screen settings-screen">
       <header className="screen-bar">
@@ -92,6 +92,25 @@ function SettingsScreen({ settings, onChange, historyCount = 0, onClearHistory }
             최근 분석 기록 모두 삭제
           </button>
           <p className="settings-danger-note">브라우저에 저장된 분석 기록만 삭제됩니다.</p>
+        </div>
+      </section>
+
+      <section className="settings-group">
+        <h2 className="settings-group-title">피드백 기록 관리</h2>
+        <div className="card settings-card">
+          <div className="info-row">
+            <span>저장된 피드백</span>
+            <strong>{feedbackCount}개</strong>
+          </div>
+          <button
+            type="button"
+            className="settings-danger-button"
+            onClick={onClearFeedback}
+            disabled={feedbackCount === 0}
+          >
+            피드백 기록 모두 삭제
+          </button>
+          <p className="settings-danger-note">피드백은 이 브라우저에만 저장됩니다.</p>
         </div>
       </section>
 

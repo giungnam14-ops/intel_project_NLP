@@ -1689,6 +1689,70 @@ button, input, textarea { font: inherit; }
 
 .recent-privacy { margin: 4px 0 0; font-size: 0.82rem; color: var(--c-muted); line-height: 1.5; }
 
+/* ---------- Result feedback ---------- */
+.result-feedback {
+  margin-top: 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #f6fbff, #ffffff);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  text-align: center;
+}
+
+.feedback-title { margin: 0 0 12px; font-size: 1rem; font-weight: 800; color: var(--c-ink); }
+
+.feedback-buttons { display: flex; gap: 10px; justify-content: center; }
+
+.feedback-btn {
+  flex: 1;
+  max-width: 200px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-line);
+  background: #fff;
+  color: var(--c-ink);
+  padding: 12px 14px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.feedback-btn:hover { transform: translateY(-1px); }
+.feedback-btn.up:hover { border-color: #2f9e6f; background: #f0fbf6; }
+.feedback-btn.down:hover { border-color: #e0a52a; background: #fff9ec; }
+
+.feedback-reasons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.feedback-reason {
+  border-radius: 999px;
+  border: 1px solid #e6c98a;
+  background: #fff9ec;
+  color: #9a6a0d;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.feedback-reason:hover { background: #fdf3da; transform: translateY(-1px); }
+
+.feedback-done { margin: 0 0 4px; font-size: 0.98rem; font-weight: 800; color: #1f8a52; }
+.feedback-done-detail { margin: 0; font-size: 0.88rem; color: var(--c-ink-soft); }
+
+.feedback-redo {
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--c-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 /* ---------- Saved-record banner (result view) ---------- */
 .saved-banner {
   margin: 0 0 14px;

@@ -7,6 +7,7 @@ import ModeSelector from './components/ModeSelector';
 import ResultView from './components/ResultView';
 import SettingsScreen from './components/SettingsScreen';
 import { addHistoryRecord, clearHistory, deleteHistoryRecord, loadHistory } from './utils/history';
+import { clearFeedback, countFeedback } from './utils/feedback';
 
 function makeRecordId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -60,6 +61,8 @@ function App() {
   const [savedView, setSavedView] = useState(false);
   const [analysisMode, setAnalysisMode] = useState('quick');
   const [isSample, setIsSample] = useState(false);
+  const [currentResultId, setCurrentResultId] = useState(null);
+  const [feedbackCount, setFeedbackCount] = useState(() => countFeedback());
 
   const hasResult = Boolean(result);
 
@@ -126,13 +129,15 @@ function App() {
 
     try {
       const data = await analyzeDocument(analysisText, ocrLow, meta?.name || '');
+      const recordId = makeRecordId();
       setResult(data);
       setSavedView(false);
       setIsSample(Boolean(sample));
+      setCurrentResultId(recordId);
       // Auto-save to recent history (localStorage). Never blocks the result.
       try {
         const next = addHistoryRecord({
-          id: makeRecordId(),
+          id: recordId,
           createdAt: new Date().toISOString(),
           title: meta?.name || '직접 입력한 문서',
           result: data,
@@ -187,9 +192,18 @@ function App() {
     setResult(record.result);
     setAnalysisMode(record.analysisMode || 'quick');
     setIsSample(Boolean(record.isSample));
+    setCurrentResultId(record.id || null);
     setError('');
     setSavedView(true);
     setTab('analyze');
+  };
+
+  const refreshFeedbackCount = () => setFeedbackCount(countFeedback());
+
+  const handleClearFeedback = () => {
+    if (!window.confirm('저장된 피드백을 모두 삭제할까요?')) return;
+    clearFeedback();
+    setFeedbackCount(0);
   };
 
   const handleDeleteRecord = (record) => {
@@ -209,6 +223,7 @@ function App() {
     setError('');
     setSavedView(false);
     setIsSample(false);
+    setCurrentResultId(null);
     clearDoc();
     setInputKey((key) => key + 1);
   };
@@ -220,6 +235,7 @@ function App() {
     setText('');
     setSavedView(false);
     setIsSample(false);
+    setCurrentResultId(null);
     clearDoc();
     setInputKey((key) => key + 1);
     setTab('analyze');
@@ -275,6 +291,8 @@ function App() {
                   savedView={savedView}
                   analysisMode={analysisMode}
                   isSample={isSample}
+                  resultId={currentResultId}
+                  onFeedbackSaved={refreshFeedbackCount}
                   onNew={handleNewAnalysis}
                 />
               ) : (
@@ -310,6 +328,8 @@ function App() {
               onChange={updateSetting}
               historyCount={history.length}
               onClearHistory={handleClearHistory}
+              feedbackCount={feedbackCount}
+              onClearFeedback={handleClearFeedback}
             />
           )}
         </main>
