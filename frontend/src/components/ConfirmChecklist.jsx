@@ -101,7 +101,6 @@ function ConfirmChecklist({ result, onShowInDocument }) {
   const sentences = collectSentences(result);
   const effectiveType = chooseType(result, sentences);
   const items = TYPE_ITEMS[effectiveType] || TYPE_ITEMS.default;
-  const isContractish = effectiveType === 'terms' || effectiveType === 'contract';
   const isUnknown = effectiveType === 'default';
 
   const rows = items.map((item) => {
@@ -112,18 +111,25 @@ function ConfirmChecklist({ result, onShowInDocument }) {
   const doneCount = Object.values(checked).filter(Boolean).length;
   const allDone = doneCount >= rows.length && rows.length > 0;
 
-  const description = isContractish
-    ? '동의하거나 진행하기 전에 꼭 확인할 항목이에요.'
-    : '체크한 항목은 내가 직접 확인했다는 표시예요. 항목을 눌러 문서 속 근거를 확인할 수 있어요.';
+  const TITLES = {
+    terms: '동의 전 확인할 것',
+    contract: '계약 전 확인할 것',
+    notice: '신청 전 확인할 것',
+    paper: '읽기 전 확인할 것',
+    default: '확인할 것'
+  };
+  const title = TITLES[effectiveType] || TITLES.default;
 
   return (
     <section className="result-section">
       <div className="section-title-row">
-        <h3>최종 확인 목록</h3>
+        <h3>{title}</h3>
         <span className="count-chip">확인 완료 {doneCount}/{rows.length}</span>
       </div>
 
-      <p className="confirm-intro">{description}</p>
+      <p className="confirm-intro">
+        문서에서 놓치면 안 되는 항목이에요. 확인한 항목은 체크해 둘 수 있어요.
+      </p>
       {isUnknown && (
         <p className="confirm-intro confirm-intro-note">
           문서 유형을 확실히 판단하기 어려워 공통 확인 항목을 보여드려요.
@@ -177,6 +183,8 @@ function ConfirmChecklist({ result, onShowInDocument }) {
           필수 확인 항목을 모두 확인했어요. 그래도 원문은 함께 확인해 주세요.
         </p>
       )}
+
+      <p className="confirm-foot">체크는 내 확인용 표시이며, 서버에 저장되지 않아요.</p>
     </section>
   );
 }

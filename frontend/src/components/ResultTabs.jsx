@@ -16,7 +16,7 @@ const TABS = [
   { key: 'qa', label: '물어보기' },
   { key: 'document', label: '문서' },
   { key: 'evidence', label: '근거' },
-  { key: 'check', label: '체크' }
+  { key: 'check', label: '확인' }
 ];
 
 const INITIAL_CARDS = 3;
@@ -64,7 +64,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
     summary: '요점으로 돌아가기',
     qa: '답변으로 돌아가기',
     evidence: '근거로 돌아가기',
-    check: '체크로 돌아가기'
+    check: '확인으로 돌아가기'
   };
   const returnTab = activeEvidence?.returnTab || 'summary';
   const returnLabel = RETURN_LABELS[returnTab] || '결과로 돌아가기';
