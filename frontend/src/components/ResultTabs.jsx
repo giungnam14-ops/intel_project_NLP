@@ -44,6 +44,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
   const [activeEvidence, setActiveEvidence] = useState(null);
 
   // Jump to the document tab and highlight the given evidence sentence.
+  // Remembers the tab we came from so the user can hop straight back.
   const showInDocument = (evidence) => {
     if (evidence) {
       // Always a fresh object so the viewer re-scrolls even on repeat clicks.
@@ -52,11 +53,21 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
         text: evidence.text || evidence.source || '',
         rawTextForMatch: evidence.rawTextForMatch || evidence.text || evidence.source || '',
         source: evidence.source || evidence.text || '',
-        quality: evidence.quality || 'normal'
+        quality: evidence.quality || 'normal',
+        returnTab: tab === 'document' ? 'summary' : tab
       });
     }
     setTab('document');
   };
+
+  const RETURN_LABELS = {
+    summary: '요점으로 돌아가기',
+    qa: '답변으로 돌아가기',
+    evidence: '근거로 돌아가기',
+    check: '체크로 돌아가기'
+  };
+  const returnTab = activeEvidence?.returnTab || 'summary';
+  const returnLabel = RETURN_LABELS[returnTab] || '결과로 돌아가기';
 
   const cards = Array.isArray(result?.cards) ? result.cards : [];
   const visibleCards = cardsExpanded ? cards : cards.slice(0, INITIAL_CARDS);
@@ -227,6 +238,23 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
 
         {tab === 'document' && (
           <section className="result-section">
+            {activeEvidence && (
+              <div className="evidence-return">
+                <button
+                  type="button"
+                  className="evidence-return-button"
+                  onClick={() => setTab(returnTab)}
+                >
+                  ← {returnLabel}
+                </button>
+                <div className="evidence-current">
+                  <span className="evidence-current-label">현재 확인 중</span>
+                  <span className="evidence-current-title">{activeEvidence.title || '선택한 근거'}</span>
+                </div>
+                <p className="evidence-current-hint">노란색으로 표시된 문장이 방금 선택한 근거예요.</p>
+              </div>
+            )}
+
             {documentMeta && (
               <>
                 <ImportedDocumentCard meta={documentMeta} readOnly />
@@ -234,6 +262,16 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
               </>
             )}
             <EvidenceDocumentViewer text={documentText} activeEvidence={activeEvidence} />
+
+            {activeEvidence && (
+              <button
+                type="button"
+                className="evidence-return-button is-bottom"
+                onClick={() => setTab(returnTab)}
+              >
+                ← {returnLabel}
+              </button>
+            )}
             <p className="tab-help">다시 분석하려면 분석 탭에서 문서를 수정해 주세요.</p>
           </section>
         )}
