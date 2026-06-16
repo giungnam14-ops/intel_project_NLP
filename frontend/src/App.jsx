@@ -5,6 +5,11 @@ import DocumentInput from './components/DocumentInput';
 import HomeScreen from './components/HomeScreen';
 import ResultView from './components/ResultView';
 import SettingsScreen from './components/SettingsScreen';
+import { addHistoryRecord, clearHistory, deleteHistoryRecord, loadHistory } from './utils/history';
+
+function makeRecordId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const SAMPLE_DOCUMENTS = {
   terms: `이용 약관에 따라 회원은 서비스 이용을 시작한 날로부터 자동결제가 이루어집니다.
@@ -49,6 +54,9 @@ function App() {
   // it survives into the result screen; revoked on replace / reset / unmount.
   const [docMeta, setDocMeta] = useState(null);
   const previewUrlRef = useRef(null);
+  // Recent analyses (localStorage only). savedView marks a restored record.
+  const [history, setHistory] = useState(loadHistory);
+  const [savedView, setSavedView] = useState(false);
 
   const hasResult = Boolean(result);
 
@@ -89,6 +97,7 @@ function App() {
     setText(SAMPLE_DOCUMENTS[type]);
     setError('');
     setResult(null);
+    setSavedView(false);
     clearDoc();
   };
 
@@ -119,6 +128,21 @@ function App() {
     try {
       const data = await analyzeDocument(text, ocrLowQuality, docMeta?.name || '');
       setResult(data);
+      setSavedView(false);
+      // Auto-save to recent history (localStorage). Never blocks the result.
+      try {
+        const next = addHistoryRecord({
+          id: makeRecordId(),
+          createdAt: new Date().toISOString(),
+          title: docMeta?.name || '직접 입력한 문서',
+          result: data,
+          extractedText: text,
+          documentMeta: docMeta
+        });
+        setHistory(next);
+      } catch (saveErr) {
+        console.warn('[문요] 분석 기록 저장 중 문제가 발생했어요.', saveErr);
+      }
     } catch (err) {
       setResult(null);
       setError(err.message || '분석 중 오류가 발생했습니다. FastAPI 서버가 실행 중인지 확인해 주세요.');
@@ -127,10 +151,35 @@ function App() {
     }
   };
 
+  // Restore a saved record into the result view (no original file preview).
+  const handleRestore = (record) => {
+    if (!record?.result) return;
+    revokePreview();
+    setDocMeta(record.documentMeta || null);
+    setOcrLowQuality(false);
+    setText(record.extractedText || '');
+    setResult(record.result);
+    setError('');
+    setSavedView(true);
+    setTab('analyze');
+  };
+
+  const handleDeleteRecord = (record) => {
+    if (!record?.id) return;
+    if (!window.confirm(`'${record.title}' 기록을 삭제할까요?`)) return;
+    setHistory(deleteHistoryRecord(record.id));
+  };
+
+  const handleClearHistory = () => {
+    if (!window.confirm('최근 분석 기록을 모두 삭제할까요?')) return;
+    setHistory(clearHistory());
+  };
+
   const handleReset = () => {
     setText('');
     setResult(null);
     setError('');
+    setSavedView(false);
     clearDoc();
     setInputKey((key) => key + 1);
   };
@@ -140,6 +189,7 @@ function App() {
     setResult(null);
     setError('');
     setText('');
+    setSavedView(false);
     clearDoc();
     setInputKey((key) => key + 1);
     setTab('analyze');
@@ -152,6 +202,7 @@ function App() {
   const startWithPicker = (which) => {
     setResult(null);
     setError('');
+    setSavedView(false);
     setTab('analyze');
     setAutoTrigger(which);
   };
@@ -165,6 +216,9 @@ function App() {
               onStart={goAnalyze}
               onImport={() => startWithPicker('file')}
               onCamera={() => startWithPicker('camera')}
+              history={history}
+              onRestore={handleRestore}
+              onDeleteRecord={handleDeleteRecord}
             />
           )}
 
@@ -186,6 +240,7 @@ function App() {
                   shortSource={settings.shortSource}
                   documentText={text}
                   documentMeta={docMeta}
+                  savedView={savedView}
                   onNew={handleNewAnalysis}
                 />
               ) : (
@@ -215,7 +270,12 @@ function App() {
           )}
 
           {tab === 'settings' && (
-            <SettingsScreen settings={settings} onChange={updateSetting} />
+            <SettingsScreen
+              settings={settings}
+              onChange={updateSetting}
+              historyCount={history.length}
+              onClearHistory={handleClearHistory}
+            />
           )}
         </main>
 

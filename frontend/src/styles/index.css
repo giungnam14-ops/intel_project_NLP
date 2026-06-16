@@ -1491,6 +1491,122 @@ button, input, textarea { font: inherit; }
   line-height: 1.5;
 }
 
+/* ---------- Recent analyses (home) ---------- */
+.recent-section { gap: 12px; }
+
+.recent-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed #cdddf6;
+  border-radius: var(--radius-md);
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.recent-list { display: flex; flex-direction: column; gap: 10px; }
+
+.recent-card {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  padding: 15px;
+  box-shadow: var(--shadow-soft);
+}
+
+.recent-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+.recent-title {
+  min-width: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--c-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-date { margin: 6px 0 0; font-size: 0.8rem; color: var(--c-muted); }
+
+.recent-summary {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--c-ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recent-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.recent-open {
+  flex: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--grad-brand);
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter 120ms ease, transform 120ms ease;
+}
+
+.recent-open:hover { filter: brightness(1.04); transform: translateY(-1px); }
+
+.recent-delete {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-line);
+  background: #fff;
+  color: var(--c-muted);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.recent-delete:hover { background: #fff4f2; color: #c0492f; border-color: #ffd7ce; }
+
+.recent-privacy { margin: 4px 0 0; font-size: 0.82rem; color: var(--c-muted); line-height: 1.5; }
+
+/* ---------- Saved-record banner (result view) ---------- */
+.saved-banner {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: #eef5ff;
+  border: 1px solid #d6e4fb;
+  color: var(--c-primary-strong);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ---------- Settings: history management ---------- */
+.settings-danger-button {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid #ffd7ce;
+  background: #fff4f2;
+  color: #c0492f;
+  padding: 12px 14px;
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.settings-danger-button:hover:not(:disabled) { background: #ffe7e1; }
+.settings-danger-button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.settings-danger-note { margin: 9px 0 0; font-size: 0.84rem; color: var(--c-muted); }
+
 /* ---------- Result document bar ---------- */
 .result-docbar {
   display: flex;

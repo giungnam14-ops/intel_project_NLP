@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import HowToUse from './HowToUse';
+import RecentAnalyses from './RecentAnalyses';
 
 const GUIDE_KEY = 'munyo-guide-dismissed';
 
-function HomeScreen({ onStart, onImport, onCamera }) {
+function HomeScreen({ onStart, onImport, onCamera, history, onRestore, onDeleteRecord }) {
   const [showGuide, setShowGuide] = useState(() => {
     try {
       return localStorage.getItem(GUIDE_KEY) !== '1';
@@ -52,6 +53,8 @@ function HomeScreen({ onStart, onImport, onCamera }) {
       </header>
 
       {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
+
+      <RecentAnalyses records={history} onRestore={onRestore} onDelete={onDeleteRecord} />
 
       <section className="home-section">
         <h2 className="home-section-title">이런 문서에 딱 맞아요</h2>

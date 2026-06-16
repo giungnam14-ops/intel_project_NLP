@@ -19,7 +19,7 @@ function SettingToggle({ label, desc, checked, onChange }) {
   );
 }
 
-function SettingsScreen({ settings, onChange }) {
+function SettingsScreen({ settings, onChange, historyCount = 0, onClearHistory }) {
   return (
     <div className="screen settings-screen">
       <header className="screen-bar">
@@ -77,11 +77,30 @@ function SettingsScreen({ settings, onChange }) {
       </section>
 
       <section className="settings-group">
+        <h2 className="settings-group-title">기록 관리</h2>
+        <div className="card settings-card">
+          <div className="info-row">
+            <span>저장된 최근 분석</span>
+            <strong>{historyCount}개</strong>
+          </div>
+          <button
+            type="button"
+            className="settings-danger-button"
+            onClick={onClearHistory}
+            disabled={historyCount === 0}
+          >
+            최근 분석 기록 모두 삭제
+          </button>
+          <p className="settings-danger-note">브라우저에 저장된 분석 기록만 삭제됩니다.</p>
+        </div>
+      </section>
+
+      <section className="settings-group">
         <h2 className="settings-group-title">개인정보 안내</h2>
         <div className="card settings-card info-text">
           <p>
             파일은 서버에 저장하지 않으며, 추출된 텍스트만 분석에 사용합니다.
-            분석 설정은 이 기기의 브라우저에만 저장됩니다.
+            분석 설정과 분석 기록은 이 기기의 브라우저에만 저장되고, 원본 파일은 저장하지 않습니다.
           </p>
         </div>
       </section>

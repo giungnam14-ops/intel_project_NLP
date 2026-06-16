@@ -255,11 +255,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
               </div>
             )}
 
-            {documentMeta && (
-              <>
-                <ImportedDocumentCard meta={documentMeta} readOnly />
-                <DocumentPreview meta={documentMeta} text={documentText} readOnly />
-              </>
+            {documentMeta && <ImportedDocumentCard meta={documentMeta} readOnly />}
+            {documentMeta?.previewUrl && (
+              <DocumentPreview meta={documentMeta} text={documentText} readOnly />
             )}
             <EvidenceDocumentViewer
               text={documentText}
