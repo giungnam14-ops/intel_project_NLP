@@ -556,6 +556,54 @@ button, input, textarea { font: inherit; }
 
 .summary-text { margin: 0; color: #f1f8ff; line-height: 1.7; font-size: 1.1rem; }
 
+/* Importance explanation on the summary card */
+.risk-explain {
+  margin: 0 0 12px;
+  color: #eaf4ff;
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.risk-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.risk-reasons-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.risk-reason-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+
+.risk-reason-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.risk-quality {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 220, 150, 0.18);
+  border: 1px solid rgba(255, 220, 150, 0.4);
+  color: #ffe9c2;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 /* ---------- 핵심 요약 (always-on brief) ---------- */
 .summary-brief {
   border: 1px solid var(--c-line);

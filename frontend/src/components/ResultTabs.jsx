@@ -164,7 +164,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
             </p>
 
             {/* 1. 한 줄 결론 */}
-            <ResultSummary result={result} />
+            <ResultSummary result={result} noisy={noisyDocument} />
 
             {/* 핵심 요약 — 데이터가 부족해도 항상 표시 */}
             <SummaryBrief
