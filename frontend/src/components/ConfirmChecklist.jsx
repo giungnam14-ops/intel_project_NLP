@@ -203,7 +203,7 @@ function ConfirmChecklist({ result, onShowInDocument }) {
         </p>
       )}
 
-      <p className="confirm-foot">체크는 내 확인용 표시이며, 서버에 저장되지 않아요.</p>
+      <p className="confirm-foot">체크박스는 내가 직접 확인했다는 표시예요. 서버에 저장되지 않아요.</p>
     </section>
   );
 }
