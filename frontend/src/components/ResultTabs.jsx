@@ -5,6 +5,7 @@ import DocumentQA from './DocumentQA';
 import EvidenceDocumentViewer from './EvidenceDocumentViewer';
 import ImportedDocumentCard from './ImportedDocumentCard';
 import ResultCard from './ResultCard';
+import ResultSearch from './ResultSearch';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
 import SummaryBrief from './SummaryBrief';
@@ -162,6 +163,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
             <p className="tab-help">
               먼저 확인할 3가지만 보고, 더 자세한 내용은 근거·체크 탭에서 볼 수 있어요.
             </p>
+
+            {/* 결과 안에서 찾기 */}
+            <ResultSearch result={result} documentText={documentText} onShowInDocument={showInDocument} />
 
             {/* 1. 한 줄 결론 */}
             <ResultSummary result={result} noisy={noisyDocument} />

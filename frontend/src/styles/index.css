@@ -604,6 +604,98 @@ button, input, textarea { font: inherit; }
   line-height: 1.5;
 }
 
+/* ---------- Result search (결과 안에서 찾기) ---------- */
+.result-search {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.result-search-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 15px;
+  border: none;
+  background: none;
+  color: var(--c-ink);
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.result-search-caret { color: var(--c-muted); font-size: 0.8rem; }
+
+.result-search-body { padding: 0 15px 15px; }
+
+.result-search-input {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid #dbe8ff;
+  background: var(--c-surface-2);
+  padding: 12px 14px;
+  font-size: 0.96rem;
+  color: var(--c-ink);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.result-search-input:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 4px rgba(43, 127, 255, 0.14);
+}
+
+.result-search-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.result-search-count { margin: 14px 0 8px; font-size: 0.84rem; font-weight: 700; color: var(--c-muted); }
+
+.result-search-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.result-search-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.result-search-item:hover { background: #e7f1ff; border-color: #bcd6ff; }
+
+.result-search-type {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--c-primary-strong);
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.result-search-snippet {
+  min-width: 0;
+  font-size: 0.9rem;
+  color: var(--c-ink-soft);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-search-lowq { font-size: 0.86rem; font-weight: 700; color: #9a6a0d; }
+
+.result-search-empty { margin: 14px 0 0; font-size: 0.9rem; color: var(--c-muted); }
+
 /* ---------- 핵심 요약 (always-on brief) ---------- */
 .summary-brief {
   border: 1px solid var(--c-line);
