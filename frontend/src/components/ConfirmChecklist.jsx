@@ -168,6 +168,25 @@ function ConfirmChecklist({ result, onShowInDocument }) {
                     문서에서 보기
                   </button>
                 )
+              ) : row.evidence.raw ? (
+                <div className="confirm-needsource">
+                  {onShowInDocument && (
+                    <button
+                      type="button"
+                      className="evidence-link is-muted"
+                      onClick={() => onShowInDocument({
+                        title: row.label,
+                        text: '',
+                        rawTextForMatch: row.evidence.raw,
+                        source: row.evidence.raw,
+                        quality: 'low'
+                      })}
+                    >
+                      원본 확인 필요
+                    </button>
+                  )}
+                  <span className="confirm-needsource-desc">추출 텍스트가 깨져 정확한 위치 표시가 어려워요.</span>
+                </div>
               ) : (
                 <p className="confirm-noevidence">
                   관련 근거를 정확히 찾지 못했어요. 근거 탭에서 원문을 함께 확인해 주세요.

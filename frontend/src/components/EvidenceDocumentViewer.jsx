@@ -6,8 +6,7 @@ function normalize(value) {
   return String(value || '').replace(/\s+/g, '').toLowerCase();
 }
 
-// Split text into sentence-like chunks without relying on regex lookbehind
-// (older Safari support). Keeps newlines as boundaries too.
+// Split text into sentence-like chunks without regex lookbehind (older Safari).
 function splitChunks(text) {
   const chunks = [];
   const lines = String(text || '').split(/\n+/);
@@ -27,42 +26,66 @@ function splitChunks(text) {
   return chunks;
 }
 
-function EvidenceDocumentViewer({ text, activeEvidence }) {
+function EvidenceDocumentViewer({ text, activeEvidence, documentMeta }) {
   const activeRef = useRef(null);
   const body = (text || '').trim();
-
   const chunks = useMemo(() => splitChunks(body), [body]);
 
-  const needle = normalize(
-    activeEvidence?.rawTextForMatch || activeEvidence?.text || activeEvidence?.source || ''
-  );
+  const isLowQuality = activeEvidence?.quality === 'low';
+  const needle = isLowQuality
+    ? ''
+    : normalize(activeEvidence?.rawTextForMatch || activeEvidence?.text || activeEvidence?.source || '');
 
-  // Decide which chunk(s) match the active evidence; the first match is active.
-  const { marks, activeIndex } = useMemo(() => {
-    const result = { marks: chunks.map(() => false), activeIndex: -1 };
-    if (!needle || needle.length < 4) return result;
+  // Match exactly ONE sentence (the shortest containing chunk) — never paint the
+  // whole document with multiple yellow boxes.
+  const activeIndex = useMemo(() => {
+    if (!needle || needle.length < 6) return -1;
+    let best = -1;
+    let bestLen = Infinity;
     chunks.forEach((chunk, index) => {
       const normChunk = normalize(chunk);
       if (!normChunk) return;
       const matched =
         normChunk.includes(needle) ||
-        (needle.length >= 6 && normChunk.length >= 6 && needle.includes(normChunk));
-      if (matched) {
-        result.marks[index] = true;
-        if (result.activeIndex === -1) result.activeIndex = index;
+        (needle.length >= 8 && normChunk.length >= 8
+          && needle.includes(normChunk) && normChunk.length >= needle.length * 0.6);
+      if (matched && normChunk.length < bestLen) {
+        bestLen = normChunk.length;
+        best = index;
       }
     });
-    return result;
+    return best;
   }, [chunks, needle]);
 
-  // Scroll to the active sentence whenever the active evidence changes.
   useEffect(() => {
     if (activeRef.current) {
       activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [activeEvidence, activeIndex]);
 
-  const notFound = Boolean(activeEvidence) && needle.length >= 4 && activeIndex === -1;
+  const pdfUrl = documentMeta?.previewKind === 'pdf' ? documentMeta?.previewUrl : '';
+
+  // Low-quality evidence → guidance card only, no highlight, no broken block.
+  if (activeEvidence && isLowQuality) {
+    return (
+      <div className="evidence-viewer">
+        <div className="evidence-guard">
+          <p className="evidence-guard-title">정확한 위치를 표시하기 어려워요</p>
+          <p className="evidence-guard-desc">
+            PDF에서 추출된 텍스트가 일부 깨져 이 근거의 위치를 정확히 찾기 어렵습니다.
+            원본 문서와 함께 확인해 주세요.
+          </p>
+          {pdfUrl && (
+            <a className="text-link-button" href={pdfUrl} target="_blank" rel="noreferrer">
+              새 탭에서 원본 열기
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const notFound = Boolean(activeEvidence) && needle.length >= 6 && activeIndex === -1;
 
   return (
     <div className="evidence-viewer">
@@ -83,9 +106,12 @@ function EvidenceDocumentViewer({ text, activeEvidence }) {
         <div className="evidence-viewer-body">
           {chunks.map((chunk, index) => {
             const isActive = index === activeIndex;
-            const className = `evidence-line${marks[index] ? (isActive ? ' is-active' : ' is-mark') : ''}`;
             return (
-              <p key={index} ref={isActive ? activeRef : null} className={className}>
+              <p
+                key={index}
+                ref={isActive ? activeRef : null}
+                className={`evidence-line${isActive ? ' is-active' : ''}`}
+              >
                 {chunk}
               </p>
             );

@@ -261,7 +261,11 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
                 <DocumentPreview meta={documentMeta} text={documentText} readOnly />
               </>
             )}
-            <EvidenceDocumentViewer text={documentText} activeEvidence={activeEvidence} />
+            <EvidenceDocumentViewer
+              text={documentText}
+              activeEvidence={activeEvidence}
+              documentMeta={documentMeta}
+            />
 
             {activeEvidence && (
               <button

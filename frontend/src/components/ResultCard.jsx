@@ -54,7 +54,7 @@ function ResultCard({ card, shortSource = false, onShowInDocument }) {
         {onShowInDocument && source && (
           <button
             type="button"
-            className="evidence-link"
+            className={`evidence-link${isGood ? '' : ' is-muted'}`}
             onClick={() => onShowInDocument({
               title: card.title || card.category,
               text: isGood ? evidence.cleaned : '',
@@ -63,7 +63,7 @@ function ResultCard({ card, shortSource = false, onShowInDocument }) {
               quality: isGood ? 'good' : 'low'
             })}
           >
-            문서에서 보기
+            {isGood ? '문서에서 보기' : '원본 확인 필요'}
           </button>
         )}
       </div>

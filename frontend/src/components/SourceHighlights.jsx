@@ -81,7 +81,7 @@ function SourceHighlights({
               {onShowInDocument && highlight?.source_text && (
                 <button
                   type="button"
-                  className="evidence-link"
+                  className={`evidence-link${isGood ? '' : ' is-muted'}`}
                   onClick={() => onShowInDocument({
                     title: highlight.label,
                     text: isGood ? evidence.cleaned : '',
@@ -90,7 +90,7 @@ function SourceHighlights({
                     quality: isGood ? 'good' : 'low'
                   })}
                 >
-                  문서에서 보기
+                  {isGood ? '문서에서 보기' : '원본 확인 필요'}
                 </button>
               )}
             </article>

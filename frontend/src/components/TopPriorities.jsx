@@ -322,7 +322,7 @@ function TopPriorities({ result, onShowInDocument }) {
                       {onShowInDocument && (
                         <button
                           type="button"
-                          className="evidence-link"
+                          className="evidence-link is-muted"
                           onClick={() => onShowInDocument({
                             title: item.title,
                             text: '',
@@ -331,7 +331,7 @@ function TopPriorities({ result, onShowInDocument }) {
                             quality: 'low'
                           })}
                         >
-                          문서에서 보기
+                          원본 확인 필요
                         </button>
                       )}
                     </div>

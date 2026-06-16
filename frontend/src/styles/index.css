@@ -1872,6 +1872,29 @@ button, input, textarea { font: inherit; }
 
 .evidence-link:hover { background: #eef5ff; border-color: #bcd6ff; }
 
+.evidence-link.is-muted {
+  border-color: #e6c98a;
+  background: #fff9ec;
+  color: #9a6a0d;
+}
+
+.evidence-link.is-muted:hover { background: #fdf3da; border-color: #e0b75e; }
+
+.confirm-needsource { margin-left: 31px; margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.confirm-needsource .evidence-link { margin: 0; }
+.confirm-needsource-desc { font-size: 0.82rem; color: var(--c-muted); }
+
+/* Document tab guidance when evidence can't be precisely located */
+.evidence-guard {
+  border: 1px dashed #e6c98a;
+  background: #fff9ec;
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.evidence-guard-title { margin: 0 0 5px; font-size: 0.96rem; font-weight: 800; color: #9a6a0d; }
+.evidence-guard-desc { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.55; color: var(--c-ink-soft); }
+
 /* ---------- Low-quality evidence notice ---------- */
 .evidence-lowq {
   border: 1px dashed #e6c98a;
@@ -1978,8 +2001,6 @@ button, input, textarea { font: inherit; }
   word-break: break-word;
   transition: background 160ms ease;
 }
-
-.evidence-line.is-mark { background: #fff3b0; }
 
 .evidence-line.is-active {
   background: #ffe066;
