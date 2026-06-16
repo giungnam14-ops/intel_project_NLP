@@ -1,4 +1,5 @@
 import { cleanEvidence } from '../utils/evidence';
+import { MODE_FOCUS } from '../utils/modes';
 
 // Per-document-type fallback templates (each is a 3-line guide). These are the
 // safety net so the 핵심 요약 card is NEVER empty, even with no analysis data.
@@ -49,7 +50,7 @@ function checkpointTerms(result) {
 }
 
 // Build a stable 2–3 line summary by combining real data with fallbacks.
-function buildLines(result, documentMeta, noisy) {
+function buildLines(result, documentMeta, noisy, mode) {
   const template = getTemplate(result?.document_type);
   const lines = [];
 
@@ -57,9 +58,15 @@ function buildLines(result, documentMeta, noisy) {
   const summary = cleanEvidence(result?.summary || '');
   lines.push(summary || template[0]);
 
-  // Line 2 — what to check. Prefer real extracted signals.
-  const terms = checkpointTerms(result);
-  lines.push(terms.length ? `특히 ${terms.join(' · ')} 항목을 먼저 확인하세요.` : template[1]);
+  // Line 2 — what to check. The selected mode focuses this line; otherwise use
+  // real extracted signals, then the type template.
+  const focus = mode && mode !== 'quick' ? MODE_FOCUS[mode] : '';
+  if (focus) {
+    lines.push(`선택한 모드에 맞춰 ${focus} 항목을 먼저 확인하세요.`);
+  } else {
+    const terms = checkpointTerms(result);
+    lines.push(terms.length ? `특히 ${terms.join(' · ')} 항목을 먼저 확인하세요.` : template[1]);
+  }
 
   // Line 3 — quality note if the text looks broken, else the type advice.
   if (noisy) {
@@ -75,8 +82,8 @@ function buildLines(result, documentMeta, noisy) {
   return lines.slice(0, 3);
 }
 
-function SummaryBrief({ result, documentMeta, noisy = false }) {
-  const lines = buildLines(result, documentMeta, noisy);
+function SummaryBrief({ result, documentMeta, noisy = false, analysisMode = 'quick' }) {
+  const lines = buildLines(result, documentMeta, noisy, analysisMode);
 
   return (
     <section className="summary-brief">

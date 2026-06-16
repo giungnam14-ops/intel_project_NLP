@@ -1,6 +1,6 @@
 import ResultTabs from './ResultTabs';
 
-function ResultView({ result, shortSource, documentText, documentMeta, savedView = false, onNew }) {
+function ResultView({ result, shortSource, documentText, documentMeta, savedView = false, analysisMode = 'quick', onNew }) {
   if (!result) return null;
 
   return (
@@ -20,6 +20,7 @@ function ResultView({ result, shortSource, documentText, documentMeta, savedView
         shortSource={shortSource}
         documentText={documentText}
         documentMeta={documentMeta}
+        analysisMode={analysisMode}
       />
     </div>
   );

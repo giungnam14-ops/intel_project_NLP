@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { askDocument } from '../api/analyze';
 import { buildEvidence } from '../utils/evidence';
 
-const SUGGESTED_QUESTIONS = [
+const DEFAULT_SUGGESTED_QUESTIONS = [
   '돈 내야 하는 부분만 알려줘',
   '환불 조건이 뭐야?',
   '개인정보 제공 내용 알려줘',
@@ -17,7 +17,10 @@ const CONFIDENCE_META = {
   low: { label: '명확히 찾지 못함', cls: 'low' }
 };
 
-function DocumentQA({ documentText, prominent = false, initialQuestion = '', initialSeq = 0, onShowInDocument }) {
+function DocumentQA({ documentText, prominent = false, initialQuestion = '', initialSeq = 0, suggestedQuestions, onShowInDocument }) {
+  const chips = Array.isArray(suggestedQuestions) && suggestedQuestions.length
+    ? suggestedQuestions
+    : DEFAULT_SUGGESTED_QUESTIONS;
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -101,7 +104,7 @@ function DocumentQA({ documentText, prominent = false, initialQuestion = '', ini
       </div>
 
       <div className="qa-chip-row">
-        {SUGGESTED_QUESTIONS.map((q) => (
+        {chips.map((q) => (
           <button
             type="button"
             key={q}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { buildEvidence } from '../utils/evidence';
+import { MODE_THEME_PRIORITY } from '../utils/modes';
 
 // Friendly, sentence-style copy per theme. Titles read as plain sentences so a
 // first-time user understands them without knowing the internal keywords.
@@ -141,7 +142,7 @@ function classifyTheme(text, tag) {
   return 'default';
 }
 
-// Gather ordered candidates (most important first) from the analysis result.
+// Gather a broad candidate pool (default importance order) from the result.
 function gatherCandidates(result) {
   const kf = result?.key_facts || {};
   const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
@@ -153,30 +154,17 @@ function gatherCandidates(result) {
 
   const candidates = [];
 
-  // 1) Most serious warning.
-  const highHl = highlights.find((h) => String(h?.severity).toLowerCase() === 'high') || highlights[0];
-  if (highHl) {
-    candidates.push({ tag: '주의', text: `${highHl.label || ''} ${highHl.source_text || ''}`, value: highHl.label, source: highHl.source_text });
-  } else if (warnings[0]) {
-    candidates.push({ tag: '주의', text: `${warnings[0].value || ''} ${warnings[0].source_text || ''}`, value: warnings[0].value, source: warnings[0].source_text });
-  }
+  // Warnings / highlights (high severity first).
+  [...highlights]
+    .sort((a, b) => (String(b?.severity).toLowerCase() === 'high' ? 1 : 0) - (String(a?.severity).toLowerCase() === 'high' ? 1 : 0))
+    .forEach((h) => candidates.push({ tag: '주의', text: `${h.label || ''} ${h.source_text || ''}`, value: h.label, source: h.source_text }));
 
-  // 2) Something the user must do.
-  if (actions[0]) {
-    candidates.push({ tag: '해야 할 일', text: `${actions[0].value || ''} ${actions[0].source_text || ''}`, value: actions[0].value, source: actions[0].source_text });
-  }
+  actions.forEach((a) => candidates.push({ tag: '해야 할 일', text: `${a.value || ''} ${a.source_text || ''}`, value: a.value, source: a.source_text }));
+  money.forEach((m) => candidates.push({ tag: '비용', text: `${m.label || ''} ${m.source_text || ''}`, value: m.value, source: m.source_text }));
+  dates.forEach((d) => candidates.push({ tag: '기한', text: `${d.label || ''} ${d.source_text || ''}`, value: d.value, source: d.source_text }));
+  warnings.forEach((w) => candidates.push({ tag: '주의', text: `${w.value || ''} ${w.source_text || ''}`, value: w.value, source: w.source_text }));
 
-  // 3) Cost / deadline / privacy.
-  if (money[0]) {
-    candidates.push({ tag: '비용', text: `${money[0].label || ''} ${money[0].source_text || ''}`, value: money[0].value, source: money[0].source_text });
-  } else if (dates[0]) {
-    candidates.push({ tag: '기한', text: `${dates[0].label || ''} ${dates[0].source_text || ''}`, value: dates[0].value, source: dates[0].source_text });
-  } else {
-    const privacy = warnings.find((w) => /개인정보|제3자/.test(w.value || ''));
-    if (privacy) candidates.push({ tag: '개인정보', text: `${privacy.value || ''} ${privacy.source_text || ''}`, value: privacy.value, source: privacy.source_text });
-  }
-
-  // Fill from cards (high importance first) if needed.
+  // Fill from cards (high importance first).
   const sortedCards = [...cards].sort((a, b) => {
     const ah = String(a?.level || '').includes('높') ? 1 : 0;
     const bh = String(b?.level || '').includes('높') ? 1 : 0;
@@ -190,10 +178,23 @@ function gatherCandidates(result) {
   return candidates;
 }
 
+// Reorder candidates so the selected mode's preferred themes come first.
+function orderByMode(candidates, mode) {
+  const priority = MODE_THEME_PRIORITY[mode] || [];
+  if (!priority.length) return candidates; // quick: natural order
+  const rank = (key) => {
+    const index = priority.indexOf(key);
+    return index === -1 ? 999 : index;
+  };
+  // Array.sort is stable in modern engines → preserves original order on ties.
+  return [...candidates].sort((a, b) => rank(a.themeKey) - rank(b.themeKey));
+}
+
 // Produce up to 3 friendly priority items, deduped by theme. Good-quality
-// evidence is preferred; low-quality (broken PDF/OCR) evidence is softened.
-function pickTop(result) {
-  const candidates = gatherCandidates(result);
+// evidence is preferred; the selected mode reorders which themes lead.
+function pickTop(result, mode) {
+  const classified = gatherCandidates(result).map((c) => ({ ...c, themeKey: classifyTheme(c.text, c.tag) }));
+  const candidates = orderByMode(classified, mode);
   const isContract = result?.document_type === 'contract';
   const items = [];
   const seenThemes = new Set();
@@ -201,7 +202,7 @@ function pickTop(result) {
   const consider = (preferGood) => {
     for (const candidate of candidates) {
       if (items.length >= 3) break;
-      const themeKey = classifyTheme(candidate.text, candidate.tag);
+      const themeKey = candidate.themeKey;
       if (seenThemes.has(themeKey)) continue;
 
       const evidence = buildEvidence(candidate.source);
@@ -238,9 +239,9 @@ function pickTop(result) {
   return items;
 }
 
-function TopPriorities({ result, onShowInDocument }) {
+function TopPriorities({ result, analysisMode = 'quick', onShowInDocument }) {
   const [open, setOpen] = useState(null);
-  const items = pickTop(result);
+  const items = pickTop(result, analysisMode);
   if (items.length === 0) return null;
 
   const highlights = Array.isArray(result?.highlights) ? result.highlights : [];

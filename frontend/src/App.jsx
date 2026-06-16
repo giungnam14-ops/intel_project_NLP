@@ -3,6 +3,7 @@ import { analyzeDocument } from './api/analyze';
 import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
 import HomeScreen from './components/HomeScreen';
+import ModeSelector from './components/ModeSelector';
 import ResultView from './components/ResultView';
 import SettingsScreen from './components/SettingsScreen';
 import { addHistoryRecord, clearHistory, deleteHistoryRecord, loadHistory } from './utils/history';
@@ -57,6 +58,7 @@ function App() {
   // Recent analyses (localStorage only). savedView marks a restored record.
   const [history, setHistory] = useState(loadHistory);
   const [savedView, setSavedView] = useState(false);
+  const [analysisMode, setAnalysisMode] = useState('quick');
 
   const hasResult = Boolean(result);
 
@@ -137,7 +139,8 @@ function App() {
           title: docMeta?.name || '직접 입력한 문서',
           result: data,
           extractedText: text,
-          documentMeta: docMeta
+          documentMeta: docMeta,
+          analysisMode
         });
         setHistory(next);
       } catch (saveErr) {
@@ -159,6 +162,7 @@ function App() {
     setOcrLowQuality(false);
     setText(record.extractedText || '');
     setResult(record.result);
+    setAnalysisMode(record.analysisMode || 'quick');
     setError('');
     setSavedView(true);
     setTab('analyze');
@@ -241,6 +245,7 @@ function App() {
                   documentText={text}
                   documentMeta={docMeta}
                   savedView={savedView}
+                  analysisMode={analysisMode}
                   onNew={handleNewAnalysis}
                 />
               ) : (
@@ -251,6 +256,7 @@ function App() {
                       <span>{error}</span>
                     </div>
                   )}
+                  <ModeSelector value={analysisMode} onChange={setAnalysisMode} />
                   <DocumentInput
                     key={inputKey}
                     text={text}

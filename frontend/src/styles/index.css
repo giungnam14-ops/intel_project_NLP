@@ -1245,6 +1245,50 @@ button, input, textarea { font: inherit; }
 .sev-chip.sev-medium { background: #fdefc6; color: #9a6a0d; }
 .sev-chip.sev-low { background: #e3effd; color: #1f6fe0; }
 
+/* ---------- Analysis mode selector ---------- */
+.mode-selector { margin-bottom: 18px; }
+
+.mode-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.mode-chip {
+  border-radius: 999px;
+  border: 1px solid #d8e6ff;
+  background: var(--c-surface-2);
+  color: var(--c-ink-soft);
+  padding: 10px 15px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.mode-chip:hover { transform: translateY(-1px); border-color: #bcd6ff; }
+
+.mode-chip.is-active {
+  background: var(--grad-brand);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--shadow-cta);
+}
+
+.mode-desc { margin: 12px 0 0; font-size: 0.9rem; color: var(--c-muted); line-height: 1.5; }
+
+/* Mode badge on the result screen */
+.result-mode {
+  margin: 0 0 12px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink-soft);
+  font-size: 0.88rem;
+  display: inline-block;
+}
+
+.result-mode strong { color: var(--c-primary-strong); font-weight: 800; }
+
+.recent-mode { color: var(--c-primary-strong); font-weight: 700; }
+
 /* ---------- Input: choose mode (how to start) ---------- */
 .import-options { display: grid; gap: 10px; margin-bottom: 16px; }
 

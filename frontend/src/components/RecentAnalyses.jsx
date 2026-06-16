@@ -1,3 +1,5 @@
+import { MODE_LABEL } from '../utils/modes';
+
 const TYPE_BADGE = {
   contract: '계약서',
   terms: '약관',
@@ -32,7 +34,12 @@ function RecentAnalyses({ records, onRestore, onDelete }) {
                   <span className="mini-tag type">{TYPE_BADGE[record.documentType]}</span>
                 )}
               </div>
-              {record.createdAt && <p className="recent-date">{formatDate(record.createdAt)}</p>}
+              <p className="recent-date">
+                {record.createdAt && <span>{formatDate(record.createdAt)}</span>}
+                {record.analysisMode && record.analysisMode !== 'quick' && (
+                  <span className="recent-mode">· {MODE_LABEL[record.analysisMode]}</span>
+                )}
+              </p>
               {record.summary && <p className="recent-summary">{record.summary}</p>}
               <div className="recent-actions">
                 <button type="button" className="recent-open" onClick={() => onRestore(record)}>

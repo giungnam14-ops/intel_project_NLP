@@ -26,7 +26,7 @@ function persist(list) {
   }
 }
 
-export function addHistoryRecord({ id, createdAt, title, result, extractedText, documentMeta }) {
+export function addHistoryRecord({ id, createdAt, title, result, extractedText, documentMeta, analysisMode }) {
   const record = {
     id,
     createdAt,
@@ -35,6 +35,7 @@ export function addHistoryRecord({ id, createdAt, title, result, extractedText, 
     documentTypeLabel: result?.document_type_label || '',
     riskLevel: result?.risk_level || '',
     summary: result?.summary || '',
+    analysisMode: analysisMode || 'quick',
     extractedText: extractedText || '',
     result: result || null,
     // Strip previewUrl / file object — keep only safe, serializable fields.

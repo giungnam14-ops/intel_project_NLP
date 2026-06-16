@@ -10,6 +10,7 @@ import SourceHighlights from './SourceHighlights';
 import SummaryBrief from './SummaryBrief';
 import TopPriorities from './TopPriorities';
 import { isDocumentNoisy } from '../utils/evidence';
+import { modeLabel, modeQuestions } from '../utils/modes';
 
 const TABS = [
   { key: 'summary', label: '요점' },
@@ -29,14 +30,7 @@ const TYPE_BADGE = {
   paper: '논문'
 };
 
-const QUICK_QUESTIONS = [
-  '돈 내야 하는 부분 알려줘',
-  '내가 해야 할 일 알려줘',
-  '불리한 조건 있어?',
-  '근거 문장 보여줘'
-];
-
-function ResultTabs({ result, shortSource, documentText, documentMeta }) {
+function ResultTabs({ result, shortSource, documentText, documentMeta, analysisMode = 'quick' }) {
   const [tab, setTab] = useState('summary');
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const [quickAsk, setQuickAsk] = useState(null); // { q, seq }
@@ -77,6 +71,8 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
     || highlights.some((item) => item?.label === '보안 주의');
   const isLongDocument = Boolean(result?.long_document) || Boolean(result?.processing_note);
   const noisyDocument = isDocumentNoisy(documentText);
+  const quickQuestions = modeQuestions(analysisMode);
+  const showModeBadge = analysisMode && analysisMode !== 'quick';
 
   const handleQuickAsk = (question) => {
     const value = (question || '').trim();
@@ -141,6 +137,10 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
         </div>
       )}
 
+      {showModeBadge && (
+        <p className="result-mode">분석 모드: <strong>{modeLabel(analysisMode)}</strong></p>
+      )}
+
       <div className="result-tabbar" role="tablist" aria-label="분석 결과 보기">
         {TABS.map((item) => (
           <button
@@ -167,10 +167,15 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
             <ResultSummary result={result} />
 
             {/* 핵심 요약 — 데이터가 부족해도 항상 표시 */}
-            <SummaryBrief result={result} documentMeta={documentMeta} noisy={noisyDocument} />
+            <SummaryBrief
+              result={result}
+              documentMeta={documentMeta}
+              noisy={noisyDocument}
+              analysisMode={analysisMode}
+            />
 
             {/* 2. 지금 꼭 확인할 것 3개 (근거는 눌러서 펼침) */}
-            <TopPriorities result={result} onShowInDocument={showInDocument} />
+            <TopPriorities result={result} analysisMode={analysisMode} onShowInDocument={showInDocument} />
 
             {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">
@@ -201,7 +206,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
                 </button>
               </div>
               <div className="quick-ask-chips">
-                {QUICK_QUESTIONS.map((question) => (
+                {quickQuestions.map((question) => (
                   <button
                     type="button"
                     key={question}
@@ -232,6 +237,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
             prominent
             initialQuestion={quickAsk?.q || ''}
             initialSeq={quickAsk?.seq || 0}
+            suggestedQuestions={quickQuestions}
             onShowInDocument={showInDocument}
           />
         )}
@@ -321,7 +327,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
           </>
         )}
 
-        {tab === 'check' && <ConfirmChecklist result={result} onShowInDocument={showInDocument} />}
+        {tab === 'check' && (
+          <ConfirmChecklist result={result} analysisMode={analysisMode} onShowInDocument={showInDocument} />
+        )}
       </div>
     </div>
   );

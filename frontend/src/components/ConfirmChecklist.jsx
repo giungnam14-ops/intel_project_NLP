@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { buildEvidence } from '../utils/evidence';
+import { MODE_ITEM_KEYWORDS } from '../utils/modes';
 
 // "최종 확인 목록" item sets per document type. Each item explains WHY it
 // matters and which keywords locate its evidence in the document.
@@ -95,13 +96,23 @@ function chooseType(result, sentences) {
   return best;
 }
 
-function ConfirmChecklist({ result, onShowInDocument }) {
+function ConfirmChecklist({ result, analysisMode = 'quick', onShowInDocument }) {
   const [checked, setChecked] = useState({});
 
   const sentences = collectSentences(result);
   const effectiveType = chooseType(result, sentences);
-  const items = TYPE_ITEMS[effectiveType] || TYPE_ITEMS.default;
+  const baseItems = TYPE_ITEMS[effectiveType] || TYPE_ITEMS.default;
   const isUnknown = effectiveType === 'default';
+
+  // Reorder items so the selected mode's relevant items come first.
+  const modeKeywords = MODE_ITEM_KEYWORDS[analysisMode] || [];
+  const items = modeKeywords.length
+    ? [...baseItems].sort(
+        (a, b) =>
+          (modeKeywords.some((kw) => b.label.includes(kw)) ? 1 : 0)
+          - (modeKeywords.some((kw) => a.label.includes(kw)) ? 1 : 0)
+      )
+    : baseItems;
 
   const rows = items.map((item) => {
     const evidence = buildEvidence(findEvidence(sentences, item.keywords));
