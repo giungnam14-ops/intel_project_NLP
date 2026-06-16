@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ConfirmChecklist from './ConfirmChecklist';
 import DocumentPreview from './DocumentPreview';
 import DocumentQA from './DocumentQA';
+import EvidenceDocumentViewer from './EvidenceDocumentViewer';
 import ImportedDocumentCard from './ImportedDocumentCard';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
@@ -38,6 +39,22 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const [quickAsk, setQuickAsk] = useState(null); // { q, seq }
   const [quickInput, setQuickInput] = useState('');
+  const [activeEvidence, setActiveEvidence] = useState(null);
+
+  // Jump to the document tab and highlight the given evidence sentence.
+  const showInDocument = (evidence) => {
+    if (evidence) {
+      // Always a fresh object so the viewer re-scrolls even on repeat clicks.
+      setActiveEvidence({
+        title: evidence.title || '',
+        text: evidence.text || evidence.source || '',
+        rawTextForMatch: evidence.rawTextForMatch || evidence.text || evidence.source || '',
+        source: evidence.source || evidence.text || '',
+        quality: evidence.quality || 'normal'
+      });
+    }
+    setTab('document');
+  };
 
   const cards = Array.isArray(result?.cards) ? result.cards : [];
   const visibleCards = cardsExpanded ? cards : cards.slice(0, INITIAL_CARDS);
@@ -127,7 +144,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
             <ResultSummary result={result} />
 
             {/* 2. 지금 꼭 확인할 것 3개 (근거는 눌러서 펼침) */}
-            <TopPriorities result={result} />
+            <TopPriorities result={result} onShowInDocument={showInDocument} />
 
             {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">
@@ -189,28 +206,30 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
             prominent
             initialQuestion={quickAsk?.q || ''}
             initialSeq={quickAsk?.seq || 0}
+            onShowInDocument={showInDocument}
           />
         )}
 
         {tab === 'document' && (
           <section className="result-section">
-            {documentMeta ? (
+            {documentMeta && (
               <>
                 <ImportedDocumentCard meta={documentMeta} readOnly />
                 <DocumentPreview meta={documentMeta} text={documentText} readOnly />
               </>
-            ) : documentText ? (
-              <DocumentPreview meta={null} text={documentText} readOnly />
-            ) : (
-              <p className="tab-empty">표시할 문서가 없습니다.</p>
             )}
+            <EvidenceDocumentViewer text={documentText} activeEvidence={activeEvidence} />
             <p className="tab-help">다시 분석하려면 분석 탭에서 문서를 수정해 주세요.</p>
           </section>
         )}
 
         {tab === 'evidence' && (
           <>
-            <SourceHighlights highlights={result?.highlights} title="주의해서 볼 문장" />
+            <SourceHighlights
+              highlights={result?.highlights}
+              title="주의해서 볼 문장"
+              onShowInDocument={showInDocument}
+            />
 
             <section className="result-section">
               <div className="section-title-row">
@@ -222,7 +241,12 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
                 <>
                   <div className="card-grid is-tight">
                     {visibleCards.map((card, index) => (
-                      <ResultCard key={`${card.category}-${index}`} card={card} shortSource={shortSource} />
+                      <ResultCard
+                        key={`${card.category}-${index}`}
+                        card={card}
+                        shortSource={shortSource}
+                        onShowInDocument={showInDocument}
+                      />
                     ))}
                   </div>
                   {cards.length > INITIAL_CARDS && (
@@ -242,7 +266,7 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
           </>
         )}
 
-        {tab === 'check' && <ConfirmChecklist result={result} />}
+        {tab === 'check' && <ConfirmChecklist result={result} onShowInDocument={showInDocument} />}
       </div>
     </div>
   );

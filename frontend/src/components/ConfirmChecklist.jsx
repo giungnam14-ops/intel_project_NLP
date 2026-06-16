@@ -54,7 +54,7 @@ function findEvidence(sentences, keywords) {
   return '';
 }
 
-function ConfirmChecklist({ result }) {
+function ConfirmChecklist({ result, onShowInDocument }) {
   const [checked, setChecked] = useState({});
   const [open, setOpen] = useState(null);
 
@@ -94,11 +94,22 @@ function ConfirmChecklist({ result }) {
                 </button>
               </div>
               {isOpen && (
-                <p className="confirm-detail">
-                  {row.evidence
-                    ? `“${row.evidence}”`
-                    : '관련 내용을 근거 탭에서 확인해 보세요.'}
-                </p>
+                <div className="confirm-detail">
+                  <p className="confirm-detail-text">
+                    {row.evidence
+                      ? `“${row.evidence}”`
+                      : '관련 내용을 근거 탭에서 확인해 보세요.'}
+                  </p>
+                  {onShowInDocument && row.evidence && (
+                    <button
+                      type="button"
+                      className="evidence-link"
+                      onClick={() => onShowInDocument({ title: row.label, text: row.evidence, source: row.evidence })}
+                    >
+                      문서에서 보기
+                    </button>
+                  )}
+                </div>
               )}
             </li>
           );

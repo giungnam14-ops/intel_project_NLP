@@ -11,7 +11,7 @@ function getLevelClass(level) {
   return 'info';
 }
 
-function ResultCard({ card, shortSource = false }) {
+function ResultCard({ card, shortSource = false, onShowInDocument }) {
   const [expanded, setExpanded] = useState(false);
 
   const excerptLength = shortSource ? SHORT_EXCERPT_LENGTH : MAX_EXCERPT_LENGTH;
@@ -41,6 +41,15 @@ function ResultCard({ card, shortSource = false }) {
             onClick={() => setExpanded((prev) => !prev)}
           >
             {expanded ? '접기' : '더 보기'}
+          </button>
+        )}
+        {onShowInDocument && source && (
+          <button
+            type="button"
+            className="evidence-link"
+            onClick={() => onShowInDocument({ title: card.title || card.category, text: source, source })}
+          >
+            문서에서 보기
           </button>
         )}
       </div>

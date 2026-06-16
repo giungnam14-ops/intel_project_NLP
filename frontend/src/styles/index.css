@@ -1767,7 +1767,83 @@ button, input, textarea { font: inherit; }
   color: var(--c-ink-soft);
   font-size: 0.9rem;
   line-height: 1.55;
+}
+
+.confirm-detail-text { margin: 0; white-space: pre-wrap; }
+
+/* ---------- "문서에서 보기" link + evidence viewer ---------- */
+.evidence-link {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border: 1px solid #cfe0fb;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--c-primary-strong);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.evidence-link:hover { background: #eef5ff; border-color: #bcd6ff; }
+
+.evidence-viewer {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.evidence-viewer-title { margin: 0 0 8px; font-size: 0.86rem; font-weight: 800; color: var(--c-muted); }
+
+.evidence-viewer-hint {
+  margin: 0 0 10px;
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  border: 1px dashed #cdddf6;
+  color: var(--c-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.evidence-viewer-miss {
+  margin: 0 0 10px;
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  background: #fff4f2;
+  border: 1px solid #ffd7ce;
+  color: #c0492f;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.evidence-viewer-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.evidence-line {
+  margin: 0 0 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: var(--c-ink);
+  font-size: 0.96rem;
+  line-height: 1.7;
   white-space: pre-wrap;
+  word-break: break-word;
+  transition: background 160ms ease;
+}
+
+.evidence-line.is-mark { background: #fff3b0; }
+
+.evidence-line.is-active {
+  background: #ffe066;
+  box-shadow: 0 0 0 2px #f2c200 inset;
+  font-weight: 600;
 }
 
 /* ---------- Quick ask (result top) ---------- */

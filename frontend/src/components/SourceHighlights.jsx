@@ -18,7 +18,8 @@ function SourceHighlights({
   initialCount,
   title = '주의 문장 하이라이트',
   showCount = true,
-  expandable = true
+  expandable = true,
+  onShowInDocument
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -51,6 +52,15 @@ function SourceHighlights({
                 <p className="highlight-source">“{highlight.source_text}”</p>
               )}
               {highlight?.reason && <p className="highlight-reason">{highlight.reason}</p>}
+              {onShowInDocument && highlight?.source_text && (
+                <button
+                  type="button"
+                  className="evidence-link"
+                  onClick={() => onShowInDocument({ title: highlight.label, text: highlight.source_text, source: highlight.source_text })}
+                >
+                  문서에서 보기
+                </button>
+              )}
             </article>
           );
         })}

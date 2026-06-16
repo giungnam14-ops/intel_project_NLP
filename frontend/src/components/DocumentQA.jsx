@@ -16,7 +16,7 @@ const CONFIDENCE_META = {
   low: { label: '명확히 찾지 못함', cls: 'low' }
 };
 
-function DocumentQA({ documentText, prominent = false, initialQuestion = '', initialSeq = 0 }) {
+function DocumentQA({ documentText, prominent = false, initialQuestion = '', initialSeq = 0, onShowInDocument }) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -131,6 +131,15 @@ function DocumentQA({ documentText, prominent = false, initialQuestion = '', ini
                 <article className="qa-evidence-card" key={index}>
                   {item?.label && <span className="qa-evidence-label">{item.label}</span>}
                   <p>{item?.source_text}</p>
+                  {onShowInDocument && item?.source_text && (
+                    <button
+                      type="button"
+                      className="evidence-link"
+                      onClick={() => onShowInDocument({ title: item.label, text: item.source_text, source: item.source_text })}
+                    >
+                      문서에서 보기
+                    </button>
+                  )}
                 </article>
               ))}
             </div>

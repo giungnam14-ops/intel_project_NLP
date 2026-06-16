@@ -225,7 +225,7 @@ function pickTop(result) {
   return items;
 }
 
-function TopPriorities({ result }) {
+function TopPriorities({ result, onShowInDocument }) {
   const [open, setOpen] = useState(null);
   const items = pickTop(result);
   if (items.length === 0) return null;
@@ -284,6 +284,15 @@ function TopPriorities({ result }) {
                     <>
                       <p className="top-priority-detail-label">근거 문장</p>
                       <p className="top-priority-source">“{item.source}”</p>
+                      {onShowInDocument && (
+                        <button
+                          type="button"
+                          className="evidence-link"
+                          onClick={() => onShowInDocument({ title: item.title, text: item.source, source: item.source })}
+                        >
+                          문서에서 보기
+                        </button>
+                      )}
                     </>
                   ) : (
                     <p className="top-priority-source muted">관련 내용을 근거 탭에서 확인해 보세요.</p>
