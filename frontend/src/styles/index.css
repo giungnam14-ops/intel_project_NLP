@@ -556,6 +556,50 @@ button, input, textarea { font: inherit; }
 
 .summary-text { margin: 0; color: #f1f8ff; line-height: 1.7; font-size: 1.1rem; }
 
+/* ---------- 핵심 요약 (always-on brief) ---------- */
+.summary-brief {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #f4f9ff, #ffffff);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.summary-brief-title {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--c-primary-strong);
+}
+
+.summary-brief-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-brief-list li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--c-ink);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.summary-brief-list li::before {
+  content: "•";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  color: var(--c-primary);
+  font-weight: 800;
+}
+
 /* ---------- Result sections ---------- */
 .result-section { margin-top: 20px; }
 

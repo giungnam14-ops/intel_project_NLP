@@ -7,6 +7,7 @@ import ImportedDocumentCard from './ImportedDocumentCard';
 import ResultCard from './ResultCard';
 import ResultSummary from './ResultSummary';
 import SourceHighlights from './SourceHighlights';
+import SummaryBrief from './SummaryBrief';
 import TopPriorities from './TopPriorities';
 import { isDocumentNoisy } from '../utils/evidence';
 
@@ -153,6 +154,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta }) {
 
             {/* 1. 한 줄 결론 */}
             <ResultSummary result={result} />
+
+            {/* 핵심 요약 — 데이터가 부족해도 항상 표시 */}
+            <SummaryBrief result={result} documentMeta={documentMeta} noisy={noisyDocument} />
 
             {/* 2. 지금 꼭 확인할 것 3개 (근거는 눌러서 펼침) */}
             <TopPriorities result={result} onShowInDocument={showInDocument} />
