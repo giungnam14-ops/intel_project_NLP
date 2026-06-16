@@ -1601,11 +1601,8 @@ button, input, textarea { font: inherit; }
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 13px 14px;
-  border: none;
-  background: none;
+  padding: 13px 14px 4px;
   text-align: left;
-  cursor: pointer;
 }
 
 .top-priority-rank {
@@ -1636,16 +1633,38 @@ button, input, textarea { font: inherit; }
 .top-priority-desc { font-size: 0.9rem; color: var(--c-ink-soft); line-height: 1.5; }
 
 .top-priority-toggle {
-  flex-shrink: 0;
-  font-size: 1.2rem;
+  display: inline-block;
+  margin: 0 0 11px 52px;
+  padding: 5px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-primary-strong);
+  font-size: 0.84rem;
   font-weight: 700;
-  color: var(--c-muted);
-  line-height: 1.2;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
+.top-priority-toggle:hover { background: #e7f1ff; border-color: #bcd6ff; }
+
 .top-priority-detail {
-  padding: 0 14px 13px 52px;
-  margin-top: -2px;
+  padding: 0 14px 14px 52px;
+}
+
+.top-priority-detail-label {
+  margin: 0 0 4px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+
+.top-priority-why {
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--c-ink-soft);
 }
 
 .top-priority-source {
