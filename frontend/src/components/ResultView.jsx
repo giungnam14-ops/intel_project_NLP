@@ -1,10 +1,13 @@
 import ResultTabs from './ResultTabs';
 
-function ResultView({ result, shortSource, documentText, documentMeta, savedView = false, analysisMode = 'quick', onNew }) {
+function ResultView({ result, shortSource, documentText, documentMeta, savedView = false, analysisMode = 'quick', isSample = false, onNew }) {
   if (!result) return null;
 
   return (
     <div className="result-view">
+      {isSample && (
+        <p className="sample-banner">📄 샘플 문서를 분석한 결과예요. 실제 문서로도 똑같이 분석할 수 있어요.</p>
+      )}
       {savedView && (
         <p className="saved-banner">저장된 분석 기록이에요. 원본 파일은 저장하지 않았어요.</p>
       )}

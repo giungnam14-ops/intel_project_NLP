@@ -30,9 +30,12 @@ function RecentAnalyses({ records, onRestore, onDelete }) {
             <article className="recent-card" key={record.id}>
               <div className="recent-card-head">
                 <span className="recent-title" title={record.title}>{record.title}</span>
-                {TYPE_BADGE[record.documentType] && (
-                  <span className="mini-tag type">{TYPE_BADGE[record.documentType]}</span>
-                )}
+                <span className="recent-badges">
+                  {record.isSample && <span className="mini-tag">샘플</span>}
+                  {TYPE_BADGE[record.documentType] && (
+                    <span className="mini-tag type">{TYPE_BADGE[record.documentType]}</span>
+                  )}
+                </span>
               </div>
               <p className="recent-date">
                 {record.createdAt && <span>{formatDate(record.createdAt)}</span>}

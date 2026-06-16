@@ -59,6 +59,7 @@ function App() {
   const [history, setHistory] = useState(loadHistory);
   const [savedView, setSavedView] = useState(false);
   const [analysisMode, setAnalysisMode] = useState('quick');
+  const [isSample, setIsSample] = useState(false);
 
   const hasResult = Boolean(result);
 
@@ -100,6 +101,7 @@ function App() {
     setError('');
     setResult(null);
     setSavedView(false);
+    setIsSample(false);
     clearDoc();
   };
 
@@ -117,30 +119,27 @@ function App() {
   // Revoke the held preview URL when the app unmounts.
   useEffect(() => revokePreview, []);
 
-  const handleAnalyze = async () => {
-    if (!text.trim()) {
-      setError('분석할 문서를 먼저 입력해 주세요.');
-      setResult(null);
-      return;
-    }
-
+  // Core analysis runner — used by both manual analyze and sample try.
+  const performAnalysis = async ({ analysisText, mode, meta, ocrLow, sample }) => {
     setError('');
     setLoading(true);
 
     try {
-      const data = await analyzeDocument(text, ocrLowQuality, docMeta?.name || '');
+      const data = await analyzeDocument(analysisText, ocrLow, meta?.name || '');
       setResult(data);
       setSavedView(false);
+      setIsSample(Boolean(sample));
       // Auto-save to recent history (localStorage). Never blocks the result.
       try {
         const next = addHistoryRecord({
           id: makeRecordId(),
           createdAt: new Date().toISOString(),
-          title: docMeta?.name || '직접 입력한 문서',
+          title: meta?.name || '직접 입력한 문서',
           result: data,
-          extractedText: text,
-          documentMeta: docMeta,
-          analysisMode
+          extractedText: analysisText,
+          documentMeta: meta,
+          analysisMode: mode,
+          isSample: Boolean(sample)
         });
         setHistory(next);
       } catch (saveErr) {
@@ -154,6 +153,30 @@ function App() {
     }
   };
 
+  const handleAnalyze = () => {
+    if (!text.trim()) {
+      setError('분석할 문서를 먼저 입력해 주세요.');
+      setResult(null);
+      return;
+    }
+    performAnalysis({ analysisText: text, mode: analysisMode, meta: docMeta, ocrLow: ocrLowQuality, sample: false });
+  };
+
+  // "샘플로 체험하기" — fill the sample and analyze immediately.
+  const handleTrySample = (sample) => {
+    if (!sample?.text) return;
+    const meta = { name: `${sample.title} 샘플`, kind: '샘플', charCount: sample.text.length, previewKind: 'text' };
+    revokePreview();
+    setText(sample.text);
+    setDocMeta(meta);
+    setOcrLowQuality(false);
+    setAnalysisMode(sample.mode || 'quick');
+    setSavedView(false);
+    setInputKey((key) => key + 1);
+    setTab('analyze');
+    performAnalysis({ analysisText: sample.text, mode: sample.mode || 'quick', meta, ocrLow: false, sample: true });
+  };
+
   // Restore a saved record into the result view (no original file preview).
   const handleRestore = (record) => {
     if (!record?.result) return;
@@ -163,6 +186,7 @@ function App() {
     setText(record.extractedText || '');
     setResult(record.result);
     setAnalysisMode(record.analysisMode || 'quick');
+    setIsSample(Boolean(record.isSample));
     setError('');
     setSavedView(true);
     setTab('analyze');
@@ -184,6 +208,7 @@ function App() {
     setResult(null);
     setError('');
     setSavedView(false);
+    setIsSample(false);
     clearDoc();
     setInputKey((key) => key + 1);
   };
@@ -194,6 +219,7 @@ function App() {
     setError('');
     setText('');
     setSavedView(false);
+    setIsSample(false);
     clearDoc();
     setInputKey((key) => key + 1);
     setTab('analyze');
@@ -207,6 +233,7 @@ function App() {
     setResult(null);
     setError('');
     setSavedView(false);
+    setIsSample(false);
     setTab('analyze');
     setAutoTrigger(which);
   };
@@ -220,6 +247,7 @@ function App() {
               onStart={goAnalyze}
               onImport={() => startWithPicker('file')}
               onCamera={() => startWithPicker('camera')}
+              onTrySample={handleTrySample}
               history={history}
               onRestore={handleRestore}
               onDeleteRecord={handleDeleteRecord}
@@ -246,6 +274,7 @@ function App() {
                   documentMeta={docMeta}
                   savedView={savedView}
                   analysisMode={analysisMode}
+                  isSample={isSample}
                   onNew={handleNewAnalysis}
                 />
               ) : (

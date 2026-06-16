@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import HowToUse from './HowToUse';
 import RecentAnalyses from './RecentAnalyses';
+import SampleDocuments from './SampleDocuments';
 
 const GUIDE_KEY = 'munyo-guide-dismissed';
 
-function HomeScreen({ onStart, onImport, onCamera, history, onRestore, onDeleteRecord }) {
+function HomeScreen({ onStart, onImport, onCamera, onTrySample, history, onRestore, onDeleteRecord }) {
   const [showGuide, setShowGuide] = useState(() => {
     try {
       return localStorage.getItem(GUIDE_KEY) !== '1';
@@ -53,6 +54,8 @@ function HomeScreen({ onStart, onImport, onCamera, history, onRestore, onDeleteR
       </header>
 
       {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
+
+      <SampleDocuments onTry={onTrySample} />
 
       <RecentAnalyses records={history} onRestore={onRestore} onDelete={onDeleteRecord} />
 
