@@ -1498,6 +1498,89 @@ button, input, textarea { font: inherit; }
 .option-text strong { font-size: 1.04rem; font-weight: 800; color: var(--c-ink); }
 .option-text small { font-size: 0.86rem; color: var(--c-muted); }
 
+/* ---------- In-app camera capture modal ---------- */
+.camera-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 30, 60, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.camera-sheet {
+  width: 100%;
+  max-width: 480px;
+  background: #0e1726;
+  color: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 16px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 540px) {
+  .camera-modal { align-items: center; }
+  .camera-sheet { border-radius: 24px; }
+}
+
+.camera-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.camera-title { font-size: 1.05rem; font-weight: 800; }
+.camera-close {
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.camera-note { margin: 0 0 12px; font-size: 0.84rem; line-height: 1.5; color: rgba(255, 255, 255, 0.8); }
+
+.camera-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 60vh;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video,
+.camera-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.camera-loading {
+  position: absolute;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.94rem;
+}
+
+.camera-error {
+  margin: 0;
+  padding: 18px;
+  text-align: center;
+  color: #ffd7ce;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.camera-actions { display: flex; gap: 10px; margin-top: 14px; }
+.camera-actions .primary-button,
+.camera-actions .secondary-button { flex: 1; }
+
 /* ---------- Imported document card ---------- */
 .imported-card {
   border-radius: var(--radius-lg);

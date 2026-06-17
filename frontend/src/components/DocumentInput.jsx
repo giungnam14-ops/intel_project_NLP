@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth/mammoth.browser';
 import Tesseract from 'tesseract.js';
+import CameraCapture from './CameraCapture';
 import DocumentPreview from './DocumentPreview';
 import ImportedDocumentCard from './ImportedDocumentCard';
 
@@ -148,9 +149,9 @@ function DocumentInput({
   onDocMeta
 }) {
   const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
   const [importMessage, setImportMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
   // mode: 'choose' (pick how to start) | 'direct' (paste/type) | 'imported' (file card)
   const [mode, setMode] = useState(text ? 'direct' : 'choose');
   const [docMeta, setDocMeta] = useState(null);
@@ -164,12 +165,12 @@ function DocumentInput({
   };
 
   const handleCameraClick = () => {
-    cameraInputRef.current?.click();
+    setCameraOpen(true);
   };
 
   const handleReimport = () => {
     if (lastSourceRef.current === 'camera') {
-      cameraInputRef.current?.click();
+      setCameraOpen(true);
     } else {
       fileInputRef.current?.click();
     }
@@ -195,10 +196,13 @@ function DocumentInput({
   // This only opens the existing native input; it does not alter extraction logic.
   useEffect(() => {
     if (!autoTrigger) return undefined;
-    // Defer slightly so the analyze screen is mounted before the picker opens
-    // (helps the camera reliably open when navigating from Home).
-    const ref = autoTrigger === 'camera' ? cameraInputRef : fileInputRef;
-    const timer = setTimeout(() => ref.current?.click(), 0);
+    if (autoTrigger === 'camera') {
+      setCameraOpen(true);
+      onAutoTriggerHandled?.();
+      return undefined;
+    }
+    // Defer slightly so the analyze screen is mounted before the picker opens.
+    const timer = setTimeout(() => fileInputRef.current?.click(), 0);
     onAutoTriggerHandled?.();
     return () => clearTimeout(timer);
   }, [autoTrigger, onAutoTriggerHandled]);
@@ -334,6 +338,18 @@ function DocumentInput({
     }
   };
 
+  // In-app camera photo → reuse the existing image OCR pipeline.
+  const handleCapturedPhoto = async (file) => {
+    setCameraOpen(false);
+    if (!file) return;
+    setBusy(true);
+    try {
+      await processFile(file, 'camera');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const titleByMode = mode === 'imported'
     ? '가져온 문서'
     : mode === 'direct'
@@ -367,7 +383,7 @@ function DocumentInput({
         </div>
       </div>
 
-      {/* Hidden native inputs — available in every mode. */}
+      {/* Hidden native input for file import (camera uses the in-app modal). */}
       <input
         ref={fileInputRef}
         type="file"
@@ -375,15 +391,10 @@ function DocumentInput({
         className="sr-only"
         onChange={(event) => handleFileChange(event, 'file')}
       />
-      {/* Camera capture: image-only + rear camera hint on mobile. */}
-      <input
-        ref={cameraInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="sr-only"
-        onChange={(event) => handleFileChange(event, 'camera')}
-      />
+
+      {cameraOpen && (
+        <CameraCapture onCapture={handleCapturedPhoto} onClose={() => setCameraOpen(false)} />
+      )}
 
       {mode === 'choose' && (
         <>
@@ -415,8 +426,8 @@ function DocumentInput({
           </div>
 
           <p className="helper-text camera-note">
-            휴대폰에서는 카메라가 열려요. 브라우저에 따라 사진 선택 화면이 함께 보일 수 있어요.
-            PC에서는 사진 파일을 선택해 분석할 수 있어요.
+            사진 찍어 분석하기를 누르면 앱 안에서 카메라가 열려요. 카메라 권한을 허용해 주세요.
+            카메라를 쓸 수 없으면 파일 가져오기로 사진을 선택할 수 있어요.
           </p>
 
           <span className="group-label">또는 예시로 빠르게 시작</span>
