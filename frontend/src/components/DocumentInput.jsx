@@ -194,13 +194,13 @@ function DocumentInput({
   // Allow the Home screen to deep-link straight into a file / camera picker.
   // This only opens the existing native input; it does not alter extraction logic.
   useEffect(() => {
-    if (!autoTrigger) return;
-    if (autoTrigger === 'file') {
-      fileInputRef.current?.click();
-    } else if (autoTrigger === 'camera') {
-      cameraInputRef.current?.click();
-    }
+    if (!autoTrigger) return undefined;
+    // Defer slightly so the analyze screen is mounted before the picker opens
+    // (helps the camera reliably open when navigating from Home).
+    const ref = autoTrigger === 'camera' ? cameraInputRef : fileInputRef;
+    const timer = setTimeout(() => ref.current?.click(), 0);
     onAutoTriggerHandled?.();
+    return () => clearTimeout(timer);
   }, [autoTrigger, onAutoTriggerHandled]);
 
   // Show the imported-document card (and the preview) for an extracted file.
@@ -371,10 +371,11 @@ function DocumentInput({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".txt,.md,.pdf,.docx,.jpg,.jpeg,.png,.webp"
+        accept=".txt,.md,.pdf,.docx,image/*"
         className="sr-only"
         onChange={(event) => handleFileChange(event, 'file')}
       />
+      {/* Camera capture: image-only + rear camera hint on mobile. */}
       <input
         ref={cameraInputRef}
         type="file"
@@ -408,10 +409,15 @@ function DocumentInput({
               <span className="option-icon" aria-hidden="true">📷</span>
               <span className="option-text">
                 <strong>사진 찍어 분석하기</strong>
-                <small>촬영한 문서를 OCR로 추출</small>
+                <small>휴대폰은 카메라가 열려요 · PC는 사진 선택</small>
               </span>
             </button>
           </div>
+
+          <p className="helper-text camera-note">
+            휴대폰에서는 카메라가 열려요. 브라우저에 따라 사진 선택 화면이 함께 보일 수 있어요.
+            PC에서는 사진 파일을 선택해 분석할 수 있어요.
+          </p>
 
           <span className="group-label">또는 예시로 빠르게 시작</span>
           <div className="chip-row">

@@ -456,6 +456,15 @@ button, input, textarea { font: inherit; }
   margin: 10px 0 0;
 }
 
+.camera-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  line-height: 1.5;
+}
+
 .helper-strong {
   color: var(--c-primary-strong);
   font-weight: 600;
