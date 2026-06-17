@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import HowToUse from './HowToUse';
 import RecentAnalyses from './RecentAnalyses';
-import SampleDocuments from './SampleDocuments';
 
 const GUIDE_KEY = 'munyo-guide-dismissed';
 
-function HomeScreen({ onStart, onImport, onCamera, onTrySample, history, onRestore, onDeleteRecord }) {
+function HomeScreen({ onStart, onImport, onCamera, onGoExperience, history, onRestore, onDeleteRecord }) {
   const [showGuide, setShowGuide] = useState(() => {
     try {
       return localStorage.getItem(GUIDE_KEY) !== '1';
@@ -53,11 +52,16 @@ function HomeScreen({ onStart, onImport, onCamera, onTrySample, history, onResto
         </div>
       </header>
 
-      {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
-
-      <SampleDocuments onTry={onTrySample} />
+      <div className="home-sample-cta">
+        <span className="home-sample-cta-text">처음이라면 샘플로 먼저 체험해 보세요.</span>
+        <button type="button" className="home-sample-cta-button" onClick={onGoExperience}>
+          샘플 체험하기
+        </button>
+      </div>
 
       <RecentAnalyses records={history} onRestore={onRestore} onDelete={onDeleteRecord} />
+
+      {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
 
       <section className="home-section">
         <h2 className="home-section-title">이런 문서에 딱 맞아요</h2>

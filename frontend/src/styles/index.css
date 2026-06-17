@@ -118,9 +118,9 @@ button, input, textarea { font: inherit; }
   width: 100%;
   max-width: 480px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
   background: rgba(255, 255, 255, 0.92);
   border-top: 1px solid var(--c-line);
   backdrop-filter: blur(14px);
@@ -1694,6 +1694,35 @@ button, input, textarea { font: inherit; }
   color: var(--c-muted);
   line-height: 1.5;
 }
+
+/* ---------- Home sample CTA (links to 체험 tab) ---------- */
+.home-sample-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface-2);
+}
+
+.home-sample-cta-text { font-size: 0.92rem; color: var(--c-ink-soft); line-height: 1.5; }
+
+.home-sample-cta-button {
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid #cfe0fb;
+  background: #fff;
+  color: var(--c-primary-strong);
+  padding: 9px 15px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.home-sample-cta-button:hover { background: #eef5ff; transform: translateY(-1px); }
 
 /* ---------- Sample documents (home) ---------- */
 .sample-section { gap: 12px; }

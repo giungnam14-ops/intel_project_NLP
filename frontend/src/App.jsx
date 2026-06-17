@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { analyzeDocument } from './api/analyze';
 import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
+import ExperienceScreen from './components/ExperienceScreen';
 import HomeScreen from './components/HomeScreen';
 import ModeSelector from './components/ModeSelector';
 import ResultView from './components/ResultView';
@@ -263,11 +264,15 @@ function App() {
               onStart={goAnalyze}
               onImport={() => startWithPicker('file')}
               onCamera={() => startWithPicker('camera')}
-              onTrySample={handleTrySample}
+              onGoExperience={() => setTab('experience')}
               history={history}
               onRestore={handleRestore}
               onDeleteRecord={handleDeleteRecord}
             />
+          )}
+
+          {tab === 'experience' && (
+            <ExperienceScreen onTrySample={handleTrySample} />
           )}
 
           {tab === 'analyze' && (
