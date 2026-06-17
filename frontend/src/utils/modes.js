@@ -2,7 +2,7 @@
 // frontend — no backend change. Default is "빠른 요약" (quick).
 
 export const ANALYSIS_MODES = [
-  { key: 'quick', label: '빠른 요약', desc: '전체 내용을 간단히 보고 싶을 때' },
+  { key: 'quick', label: '전체 분석', desc: '문서 전체를 한눈에 요약해요' },
   { key: 'money', label: '돈/환불 중심', desc: '결제·수수료·환불·위약금·보증금' },
   { key: 'privacy', label: '개인정보 중심', desc: '수집·제3자 제공·보관·동의' },
   { key: 'contract', label: '계약 조건 중심', desc: '기간·해지·특약·책임·서명' },
