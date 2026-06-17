@@ -3,6 +3,7 @@ import { analyzeDocument } from './api/analyze';
 import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
 import ExperienceScreen from './components/ExperienceScreen';
+import HistoryScreen from './components/HistoryScreen';
 import HomeScreen from './components/HomeScreen';
 import ModeSelector from './components/ModeSelector';
 import ResultView from './components/ResultView';
@@ -265,6 +266,7 @@ function App() {
               onImport={() => startWithPicker('file')}
               onCamera={() => startWithPicker('camera')}
               onGoExperience={() => setTab('experience')}
+              onGoHistory={() => setTab('history')}
               history={history}
               onRestore={handleRestore}
               onDeleteRecord={handleDeleteRecord}
@@ -273,6 +275,14 @@ function App() {
 
           {tab === 'experience' && (
             <ExperienceScreen onTrySample={handleTrySample} />
+          )}
+
+          {tab === 'history' && (
+            <HistoryScreen
+              history={history}
+              onRestore={handleRestore}
+              onDeleteRecord={handleDeleteRecord}
+            />
           )}
 
           {tab === 'analyze' && (

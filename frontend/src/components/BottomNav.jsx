@@ -2,6 +2,7 @@ const TABS = [
   { key: 'home', label: '홈', icon: '🏠' },
   { key: 'analyze', label: '분석', icon: '📝' },
   { key: 'experience', label: '체험', icon: '✨' },
+  { key: 'history', label: '기록', icon: '🕘' },
   { key: 'settings', label: '설정', icon: '⚙️' }
 ];
 

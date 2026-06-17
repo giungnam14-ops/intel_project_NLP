@@ -4,7 +4,7 @@ import RecentAnalyses from './RecentAnalyses';
 
 const GUIDE_KEY = 'munyo-guide-dismissed';
 
-function HomeScreen({ onStart, onImport, onCamera, onGoExperience, history, onRestore, onDeleteRecord }) {
+function HomeScreen({ onStart, onImport, onCamera, onGoExperience, onGoHistory, history, onRestore, onDeleteRecord }) {
   const [showGuide, setShowGuide] = useState(() => {
     try {
       return localStorage.getItem(GUIDE_KEY) !== '1';
@@ -59,7 +59,16 @@ function HomeScreen({ onStart, onImport, onCamera, onGoExperience, history, onRe
         </button>
       </div>
 
-      <RecentAnalyses records={history} onRestore={onRestore} onDelete={onDeleteRecord} />
+      {Array.isArray(history) && history.length > 0 && (
+        <RecentAnalyses
+          records={history}
+          limit={2}
+          totalCount={history.length}
+          onRestore={onRestore}
+          onDelete={onDeleteRecord}
+          onShowAll={onGoHistory}
+        />
+      )}
 
       {showGuide && <HowToUse dismissible onDismiss={dismissGuide} />}
 

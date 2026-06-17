@@ -15,8 +15,11 @@ function formatDate(iso) {
   }
 }
 
-function RecentAnalyses({ records, onRestore, onDelete }) {
-  const list = Array.isArray(records) ? records : [];
+function RecentAnalyses({ records, onRestore, onDelete, limit, onShowAll, totalCount }) {
+  const all = Array.isArray(records) ? records : [];
+  const list = typeof limit === 'number' ? all.slice(0, limit) : all;
+  const total = typeof totalCount === 'number' ? totalCount : all.length;
+  const hasMore = onShowAll && total > list.length;
 
   return (
     <section className="home-section recent-section">
@@ -55,6 +58,12 @@ function RecentAnalyses({ records, onRestore, onDelete }) {
             </article>
           ))}
         </div>
+      )}
+
+      {hasMore && (
+        <button type="button" className="recent-showall" onClick={onShowAll}>
+          기록 탭에서 모두 보기 ({total})
+        </button>
       )}
 
       <p className="recent-privacy">
