@@ -5,6 +5,7 @@ const RISK_TEXT = {
 };
 
 const LEVEL_LABEL = { high: '높음', medium: '중간', low: '낮음' };
+const LEVEL_STATUS = { high: '꼭 확인 필요', medium: '확인 권장', low: '가볍게 확인' };
 
 // Map backend risk_level + signal volume into a 3-level display bucket.
 function riskLevel(result, signalCount) {
@@ -47,10 +48,12 @@ function ResultSummary({ result, noisy = false }) {
   const reasons = riskReasons(result);
 
   return (
-    <section className="summary-card">
+    <section className={`summary-card summary-level-${level}`}>
       <div className="summary-pills">
         <span className="summary-pill">{result.document_type_label || result.document_type}</span>
-        <span className="summary-pill summary-pill-risk">중요도 {LEVEL_LABEL[level]}</span>
+        <span className={`summary-status summary-status-${level}`}>
+          중요도 {LEVEL_LABEL[level]} · {LEVEL_STATUS[level]}
+        </span>
       </div>
 
       <p className="risk-explain">{RISK_TEXT[level]}</p>

@@ -139,7 +139,7 @@ function ConfirmChecklist({ result, analysisMode = 'quick', onShowInDocument }) 
       </div>
 
       <p className="confirm-intro">
-        문서에서 놓치면 안 되는 항목이에요. 확인한 항목은 체크해 둘 수 있어요.
+        아래 항목은 직접 확인하고 넘어가면 좋아요. 체크는 내 확인용 표시예요.
       </p>
       {isUnknown && (
         <p className="confirm-intro confirm-intro-note">

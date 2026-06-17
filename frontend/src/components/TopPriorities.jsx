@@ -259,9 +259,10 @@ function TopPriorities({ result, analysisMode = 'quick', onShowInDocument }) {
   else hint = TYPE_HINTS.default;
 
   return (
-    <section className="top-priorities">
+    <section className="top-priorities is-main">
       <div className="top-priorities-head">
-        <h3 className="top-priorities-title">지금 꼭 확인할 것</h3>
+        <span className="top-priorities-eyebrow">가장 먼저 볼 것</span>
+        <h3 className="top-priorities-title">이 문서에서는 아래 {items.length}가지를 먼저 확인하세요</h3>
         <p className="top-priorities-hint">{hint}</p>
       </div>
 

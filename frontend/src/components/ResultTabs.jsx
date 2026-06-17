@@ -290,6 +290,8 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
 
         {tab === 'evidence' && (
           <>
+            <p className="tab-role-intro">문요가 중요하다고 판단한 근거 문장이에요.</p>
+
             <SourceHighlights
               highlights={result?.highlights}
               title="주의해서 볼 문장"
