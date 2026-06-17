@@ -585,6 +585,19 @@ button, input, textarea { font: inherit; }
 .summary-status-medium { color: #9a6a0d; }
 .summary-status-low { color: #1f6fe0; }
 
+/* Toxic-clause flag on the summary card */
+.risk-flag {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 120, 90, 0.18);
+  border: 1px solid rgba(255, 150, 120, 0.4);
+  color: #ffe1d7;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 /* Importance explanation on the summary card */
 .risk-explain {
   margin: 0 0 12px;
@@ -632,6 +645,125 @@ button, input, textarea { font: inherit; }
   font-size: 0.88rem;
   line-height: 1.5;
 }
+
+/* ---------- Risk score / toxic clauses ---------- */
+.risk-chip-high { background: #ffe2db; color: #c0492f; border-color: #ffd0c6; }
+.risk-chip-medium { background: #fdefc6; color: #9a6a0d; border-color: #f0dcae; }
+.risk-chip-low, .risk-chip-none { background: var(--c-surface-2); color: var(--c-muted); }
+
+.risk-gauge {
+  height: 12px;
+  border-radius: 999px;
+  background: #eef2f8;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.risk-gauge-fill { display: block; height: 100%; border-radius: 999px; transition: width 280ms ease; min-width: 2px; }
+.risk-gauge-high { background: linear-gradient(90deg, #e3502f, #b3261e); }
+.risk-gauge-medium { background: linear-gradient(90deg, #e0a52a, #b9791b); }
+.risk-gauge-low { background: linear-gradient(90deg, #5aa5ff, #2b7fff); }
+.risk-gauge-none { background: #cdd8e8; }
+
+.risk-level-text { margin: 0 0 12px; font-size: 0.92rem; color: var(--c-ink-soft); line-height: 1.5; }
+
+.risk-clause-list { display: flex; flex-direction: column; gap: 9px; }
+
+.risk-clause {
+  border: 1px solid #ffd7ce;
+  border-left: 4px solid #e3502f;
+  background: #fff6f3;
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+}
+
+.risk-clause-head { display: flex; align-items: center; gap: 8px; }
+.risk-clause-icon { font-size: 1rem; }
+.risk-clause-label { font-size: 1rem; font-weight: 800; color: var(--c-ink); }
+.risk-clause-why { margin: 6px 0 0; font-size: 0.9rem; line-height: 1.5; color: var(--c-ink-soft); }
+
+/* ---------- Glossary (어려운 말 풀이) ---------- */
+.glossary-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-surface-2);
+  color: var(--c-ink);
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.glossary-caret { color: var(--c-muted); font-size: 0.8rem; }
+
+.glossary-list {
+  margin: 10px 0 0;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.glossary-item { border-bottom: 1px solid var(--c-line); padding-bottom: 9px; }
+.glossary-item:last-child { border-bottom: none; padding-bottom: 0; }
+.glossary-term { margin: 0; font-size: 0.96rem; font-weight: 800; color: var(--c-primary-strong); }
+.glossary-desc { margin: 3px 0 0; font-size: 0.9rem; line-height: 1.55; color: var(--c-ink-soft); }
+
+/* ---------- Deadlines (기한 챙기기) ---------- */
+.deadline-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.deadline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 12px 14px;
+}
+
+.deadline-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.deadline-value { font-size: 0.98rem; font-weight: 800; color: var(--c-ink); }
+.deadline-label { font-size: 0.82rem; color: var(--c-muted); }
+
+.deadline-add {
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid #cfe0fb;
+  background: #fff;
+  color: var(--c-primary-strong);
+  padding: 8px 13px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.deadline-add:hover { background: #eef5ff; }
+.deadline-relative { flex-shrink: 0; font-size: 0.82rem; color: var(--c-muted); }
+
+.deadline-export-all {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--grad-brand);
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter 120ms ease, transform 120ms ease;
+}
+
+.deadline-export-all:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.deadline-note { margin: 10px 0 0; font-size: 0.82rem; color: var(--c-muted); line-height: 1.5; }
 
 /* ---------- Result search (결과 안에서 찾기) ---------- */
 .result-search {

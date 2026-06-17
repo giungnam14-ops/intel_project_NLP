@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import ConfirmChecklist from './ConfirmChecklist';
+import DeadlineExport from './DeadlineExport';
 import DocumentPreview from './DocumentPreview';
 import DocumentQA from './DocumentQA';
 import EvidenceDocumentViewer from './EvidenceDocumentViewer';
+import GlossaryHelp from './GlossaryHelp';
+import RiskClauses from './RiskClauses';
 import ImportedDocumentCard from './ImportedDocumentCard';
 import ResultCard from './ResultCard';
 import ResultSearch from './ResultSearch';
@@ -292,6 +295,10 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
           <>
             <p className="tab-role-intro">문요가 중요하다고 판단한 근거 문장이에요.</p>
 
+            <RiskClauses result={result} onShowInDocument={showInDocument} />
+
+            <GlossaryHelp documentText={documentText} />
+
             <SourceHighlights
               highlights={result?.highlights}
               title="주의해서 볼 문장"
@@ -334,7 +341,10 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
         )}
 
         {tab === 'check' && (
-          <ConfirmChecklist result={result} analysisMode={analysisMode} onShowInDocument={showInDocument} />
+          <>
+            <DeadlineExport result={result} />
+            <ConfirmChecklist result={result} analysisMode={analysisMode} onShowInDocument={showInDocument} />
+          </>
         )}
       </div>
     </div>

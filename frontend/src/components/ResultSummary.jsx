@@ -4,6 +4,8 @@ const RISK_TEXT = {
   low: '큰 위험 신호는 적지만, 원문 확인은 필요해요.'
 };
 
+import { computeRisk } from '../utils/riskScore';
+
 const LEVEL_LABEL = { high: '높음', medium: '중간', low: '낮음' };
 const LEVEL_STATUS = { high: '꼭 확인 필요', medium: '확인 권장', low: '가볍게 확인' };
 
@@ -46,6 +48,7 @@ function ResultSummary({ result, noisy = false }) {
 
   const level = riskLevel(result, signalCount);
   const reasons = riskReasons(result);
+  const risk = computeRisk(result);
 
   return (
     <section className={`summary-card summary-level-${level}`}>
@@ -67,6 +70,10 @@ function ResultSummary({ result, noisy = false }) {
             ))}
           </span>
         </div>
+      )}
+
+      {risk.clauses.length > 0 && (
+        <p className="risk-flag">독소조항 {risk.clauses.length}개 발견 · 위험 점수 {risk.score}점 (근거 탭에서 확인)</p>
       )}
 
       {noisy && (
