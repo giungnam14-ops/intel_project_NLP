@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { buildEvidence } from '../utils/evidence';
 import { MODE_THEME_PRIORITY } from '../utils/modes';
 
@@ -190,9 +189,57 @@ function orderByMode(candidates, mode) {
   return [...candidates].sort((a, b) => rank(a.themeKey) - rank(b.themeKey));
 }
 
+// Keywords used to pull a real sentence out of the extracted document text for
+// each theme — so we can show an actual sentence even when the backend's
+// structured extraction came back sparse (e.g. a noisy PDF contract).
+const THEME_SCAN = {
+  money: ['보증금', '월세', '금액', '대금', '계약금', '중도금', '잔금', '요금', '수수료', '결제', '자동결제'],
+  refund: ['환불'],
+  cancel: ['해지', '해제', '위약금', '손해배상', '중도'],
+  privacy: ['개인정보', '제3자', '제 3자', '제공'],
+  date: ['계약기간', '계약 기간', '임대차', '기간', '기한', '까지', '이내', '개시', '만료'],
+  special: ['특약', '별도 약정', '단서'],
+  action: ['서명', '날인', '제출', '신청', '동의', '확인', '변경'],
+  liability: ['책임', '면책', '배상'],
+  restriction: ['제한', '금지', '정지'],
+  unfair: ['불리', '위험', '주의'],
+  default: []
+};
+
+function splitDocSentences(text) {
+  const out = [];
+  String(text || '').split(/\n+/).forEach((line) => {
+    let current = '';
+    for (const ch of line) {
+      current += ch;
+      if ('.!?。'.includes(ch)) {
+        const trimmed = current.trim();
+        if (trimmed) out.push(trimmed);
+        current = '';
+      }
+    }
+    const tail = current.trim();
+    if (tail) out.push(tail);
+  });
+  return out;
+}
+
+// Return a readable (good-quality) document sentence for a theme, or '' if none.
+function findSentenceForTheme(documentText, themeKey) {
+  const keywords = THEME_SCAN[themeKey] || [];
+  if (!keywords.length) return '';
+  for (const sentence of splitDocSentences(documentText)) {
+    if (sentence.length < 8 || sentence.length > 220) continue;
+    if (!keywords.some((kw) => sentence.includes(kw))) continue;
+    const ev = buildEvidence(sentence);
+    if (ev.quality === 'good' && ev.cleaned) return ev.cleaned;
+  }
+  return '';
+}
+
 // Produce up to 3 friendly priority items, deduped by theme. Good-quality
 // evidence is preferred; the selected mode reorders which themes lead.
-function pickTop(result, mode) {
+function pickTop(result, mode, documentText) {
   const classified = gatherCandidates(result).map((c) => ({ ...c, themeKey: classifyTheme(c.text, c.tag) }));
   const candidates = orderByMode(classified, mode);
   const isContract = result?.document_type === 'contract';
@@ -236,12 +283,26 @@ function pickTop(result, mode) {
   consider(true);
   if (items.length < 3) consider(false);
 
+  // Supplement with a real document sentence when the structured evidence was
+  // missing or low-quality, so each item points to an actual sentence.
+  if (documentText) {
+    for (const item of items) {
+      if (item.quality !== 'good' || !item.cleaned) {
+        const found = findSentenceForTheme(documentText, item.themeKey);
+        if (found) {
+          item.cleaned = found;
+          item.raw = found;
+          item.quality = 'good';
+        }
+      }
+    }
+  }
+
   return items;
 }
 
-function TopPriorities({ result, analysisMode = 'quick', onShowInDocument }) {
-  const [open, setOpen] = useState(null);
-  const items = pickTop(result, analysisMode);
+function TopPriorities({ result, analysisMode = 'quick', documentText = '', onShowInDocument }) {
+  const items = pickTop(result, analysisMode, documentText);
   if (items.length === 0) return null;
 
   const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
@@ -268,7 +329,7 @@ function TopPriorities({ result, analysisMode = 'quick', onShowInDocument }) {
 
       <ol className="top-priorities-list">
         {items.map((item, index) => {
-          const isOpen = open === index;
+          const hasSentence = item.quality === 'good' && Boolean(item.cleaned);
           return (
             <li className="top-priority-item" key={`${item.themeKey}-${index}`}>
               <div className="top-priority-row">
@@ -279,68 +340,31 @@ function TopPriorities({ result, analysisMode = 'quick', onShowInDocument }) {
                     {item.title}
                   </span>
                   <span className="top-priority-desc">{item.desc}</span>
+
+                  {hasSentence ? (
+                    <span className="top-priority-quote">“{item.cleaned}”</span>
+                  ) : item.raw ? (
+                    <span className="top-priority-quote is-muted">추출 텍스트가 일부 깨져 있어요. 원본에서 확인해 주세요.</span>
+                  ) : (
+                    <span className="top-priority-quote is-muted">관련 문장을 찾지 못했어요. 근거 탭에서 확인해 주세요.</span>
+                  )}
                 </span>
               </div>
 
-              <button
-                type="button"
-                className="top-priority-toggle"
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : index)}
-              >
-                {isOpen ? '접기' : '근거 보기'}
-              </button>
-
-              {isOpen && (
-                <div className="top-priority-detail">
-                  <p className="top-priority-detail-label">왜 중요해요</p>
-                  <p className="top-priority-why">{item.why}</p>
-                  {item.quality === 'good' && item.cleaned ? (
-                    <>
-                      <p className="top-priority-detail-label">근거 문장</p>
-                      <p className="top-priority-source">“{item.cleaned}”</p>
-                      {onShowInDocument && (
-                        <button
-                          type="button"
-                          className="evidence-link"
-                          onClick={() => onShowInDocument({
-                            title: item.title,
-                            text: item.cleaned,
-                            rawTextForMatch: item.raw,
-                            source: item.cleaned,
-                            quality: 'good'
-                          })}
-                        >
-                          문서에서 보기
-                        </button>
-                      )}
-                    </>
-                  ) : item.raw ? (
-                    <div className="evidence-lowq">
-                      <p className="evidence-lowq-title">근거 문장을 정확히 찾기 어려워요</p>
-                      <p className="evidence-lowq-desc">
-                        PDF에서 추출된 텍스트가 일부 깨져 있어요. 원본 문서나 추출 텍스트를 확인해 주세요.
-                      </p>
-                      {onShowInDocument && (
-                        <button
-                          type="button"
-                          className="evidence-link is-muted"
-                          onClick={() => onShowInDocument({
-                            title: item.title,
-                            text: '',
-                            rawTextForMatch: item.raw,
-                            source: item.raw,
-                            quality: 'low'
-                          })}
-                        >
-                          원본 확인 필요
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="top-priority-source muted">관련 내용을 근거 탭에서 확인해 보세요.</p>
-                  )}
-                </div>
+              {onShowInDocument && (item.raw || item.cleaned) && (
+                <button
+                  type="button"
+                  className={`evidence-link${hasSentence ? '' : ' is-muted'}`}
+                  onClick={() => onShowInDocument({
+                    title: item.title,
+                    text: hasSentence ? item.cleaned : '',
+                    rawTextForMatch: item.raw,
+                    source: hasSentence ? item.cleaned : item.raw,
+                    quality: hasSentence ? 'good' : 'low'
+                  })}
+                >
+                  {hasSentence ? '문서에서 보기' : '원본 확인 필요'}
+                </button>
               )}
             </li>
           );

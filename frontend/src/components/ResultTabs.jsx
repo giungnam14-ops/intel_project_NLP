@@ -182,7 +182,12 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
             />
 
             {/* 2. 지금 꼭 확인할 것 3개 (근거는 눌러서 펼침) */}
-            <TopPriorities result={result} analysisMode={analysisMode} onShowInDocument={showInDocument} />
+            <TopPriorities
+              result={result}
+              analysisMode={analysisMode}
+              documentText={documentText}
+              onShowInDocument={showInDocument}
+            />
 
             {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">

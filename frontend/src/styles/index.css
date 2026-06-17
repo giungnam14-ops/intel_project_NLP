@@ -2596,6 +2596,28 @@ button, input, textarea { font: inherit; }
 .top-priority-emoji { font-size: 1.05rem; line-height: 1; }
 .top-priority-desc { font-size: 0.9rem; color: var(--c-ink-soft); line-height: 1.5; }
 
+.top-priority-quote {
+  display: block;
+  margin-top: 7px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  border-left: 3px solid var(--c-primary);
+  color: var(--c-ink);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.top-priority-quote.is-muted {
+  border-left-color: #e6c98a;
+  color: var(--c-muted);
+  font-size: 0.86rem;
+}
+
+.top-priority-item .evidence-link { margin: 10px 0 0 38px; }
+
 .top-priority-toggle {
   display: inline-block;
   margin: 0 0 11px 52px;
