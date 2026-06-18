@@ -23,7 +23,9 @@ from pii_masker import mask_pii_text
 # window; this is a pragmatic ceiling, not a context limit.
 MAX_INPUT_CHARS = 30000
 
-MODEL = "claude-opus-4-8"
+# Cost-efficient model. (Haiku 4.5 supports structured outputs; it does not use
+# the adaptive-thinking parameter, so we omit `thinking` in the call below.)
+MODEL = "claude-haiku-4-5"
 
 SYSTEM_PROMPT = (
     "당신은 약관·계약서·공지문·논문 같은 어려운 문서를 일반 사용자가 쉽게 이해하도록"
@@ -121,7 +123,6 @@ def ai_refine(document_text: str) -> dict[str, Any]:
         response = client.messages.create(
             model=MODEL,
             max_tokens=4000,
-            thinking={"type": "adaptive"},
             system=SYSTEM_PROMPT,
             output_config={"format": {"type": "json_schema", "schema": OUTPUT_SCHEMA}},
             messages=[{"role": "user", "content": user_prompt}],

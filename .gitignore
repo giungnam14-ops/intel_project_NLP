@@ -2,6 +2,9 @@ __pycache__/
 *.pyc
 .venv/
 .env
+# 로컬에서 생성되는 사용자 데이터(피드백/후기/문의) — 커밋 금지
+feedback_data.jsonl
+messages_data.jsonl
 node_modules/
 dist/
 build/
