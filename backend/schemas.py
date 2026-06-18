@@ -22,6 +22,20 @@ class AiAnalyzeRequest(BaseModel):
     filename: str = ""
 
 
+class FeedbackRequest(BaseModel):
+    """Anonymous feedback for admin review.
+
+    Intentionally has NO document-text field — only the rating and a few
+    non-identifying fields are accepted, so no document content is ever stored.
+    """
+
+    helpful: bool = False
+    reason: str = ""
+    note: str = ""
+    document_type: str = ""
+    analysis_mode: str = ""
+
+
 class AiKeyPoint(BaseModel):
     title: str
     detail: str

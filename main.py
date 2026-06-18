@@ -1,11 +1,12 @@
 import os
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.ai_refine import ai_available, ai_refine
 from backend.analyzer import analyze_document
 from backend.document_qa import answer_question
+from backend.feedback_store import add_feedback, load_all, summarize
 from backend.schemas import (
     AiAnalyzeRequest,
     AiAnalyzeResponse,
@@ -16,6 +17,7 @@ from backend.schemas import (
     AskRequest,
     AskResponse,
     EvidenceItem,
+    FeedbackRequest,
     KeyFacts,
 )
 from guardrails import apply_guardrails
@@ -92,6 +94,33 @@ def ask(request: AskRequest) -> AskResponse:
         evidence=[EvidenceItem(**item) for item in result.get("evidence", [])],
         suggested_followups=result.get("suggested_followups", []),
     )
+
+
+@app.post("/feedback")
+def feedback(request: FeedbackRequest) -> dict:
+    """Store one anonymous feedback record (no document text). Best-effort:
+    failures here must never break the user's result screen."""
+    add_feedback(request.model_dump())
+    return {"ok": True}
+
+
+@app.get("/admin/feedback")
+def admin_feedback(x_admin_token: str | None = Header(default=None)) -> dict:
+    """Admin-only: aggregated feedback for review. Protected by the ADMIN_TOKEN
+    env var (simple token, no account system)."""
+    token = os.getenv("ADMIN_TOKEN", "").strip()
+    if not token:
+        raise HTTPException(
+            status_code=503,
+            detail="관리자 기능이 설정되지 않았습니다. (서버에 ADMIN_TOKEN 필요)",
+        )
+    if not x_admin_token or x_admin_token != token:
+        raise HTTPException(status_code=401, detail="관리자 인증에 실패했습니다.")
+
+    items = load_all()
+    # Newest first, cap how many raw rows are returned.
+    recent = list(reversed(items))[:500]
+    return {"summary": summarize(items), "items": recent}
 
 
 @app.get("/ai-status")

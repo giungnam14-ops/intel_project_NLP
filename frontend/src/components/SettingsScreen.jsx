@@ -1,3 +1,4 @@
+import AdminFeedback from './AdminFeedback';
 import HowToUse from './HowToUse';
 
 function SettingToggle({ label, desc, checked, onChange }) {
@@ -113,6 +114,8 @@ function SettingsScreen({ settings, onChange, historyCount = 0, onClearHistory, 
           <p className="settings-danger-note">피드백은 이 브라우저에만 저장됩니다.</p>
         </div>
       </section>
+
+      <AdminFeedback />
 
       <section className="settings-group">
         <h2 className="settings-group-title">개인정보 안내</h2>

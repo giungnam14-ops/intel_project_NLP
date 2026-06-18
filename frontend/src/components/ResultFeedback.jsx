@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { submitFeedback } from '../api/analyze';
 import { getFeedbackFor, saveFeedback } from '../utils/feedback';
 
 const REASONS = [
@@ -17,6 +18,14 @@ function ResultFeedback({ resultId, documentType, analysisMode, onSaved }) {
 
   const commit = (data) => {
     saveFeedback({ resultId, documentType, analysisMode, ...data });
+    // Best-effort, anonymous send for admin review (no document text).
+    submitFeedback({
+      helpful: data.helpful,
+      reason: data.reason || '',
+      note: data.note || '',
+      document_type: documentType || '',
+      analysis_mode: analysisMode || 'quick'
+    });
     onSaved?.();
   };
 

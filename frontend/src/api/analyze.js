@@ -34,6 +34,40 @@ export async function analyzeDocument(text, ocrLowQuality = false, filename = ''
   return response.json();
 }
 
+export async function submitFeedback(payload) {
+  // Best-effort: send anonymous feedback to the server for admin review.
+  // Never throws — the result screen must not depend on this succeeding.
+  try {
+    const response = await fetch(`${API_BASE_URL}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        helpful: Boolean(payload?.helpful),
+        reason: payload?.reason || '',
+        note: payload?.note || '',
+        document_type: payload?.document_type || '',
+        analysis_mode: payload?.analysis_mode || 'quick'
+      })
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function fetchAdminFeedback(token) {
+  const response = await fetch(`${API_BASE_URL}/admin/feedback`, {
+    headers: { 'x-admin-token': token || '' }
+  });
+  if (!response.ok) {
+    let message = '평가를 불러오지 못했어요.';
+    if (response.status === 401) message = '관리자 토큰이 올바르지 않아요.';
+    else if (response.status === 503) message = '서버에 관리자 기능(ADMIN_TOKEN)이 설정되지 않았어요.';
+    throw new Error(message);
+  }
+  return response.json();
+}
+
 export async function aiStatus() {
   // Cheap check (no LLM call) used to hide the opt-in AI feature until a key is
   // configured. Any failure → treat as unavailable so the free flow stays clean.
