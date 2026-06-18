@@ -3671,3 +3671,21 @@ html.is-large-text { font-size: 18px; }
   border-radius: 999px;
 }
 .admin-msg-body { margin: 0; font-size: 0.88rem; color: var(--c-ink); line-height: 1.55; white-space: pre-wrap; }
+
+/* ---- 결과 요점 탭 밀도 ↑ (모바일 스크롤 감소) -------------------------- */
+.result-search { margin-bottom: 10px; }
+.summary-brief { padding: 13px; margin-bottom: 10px; }
+.summary-brief-title { margin: 0 0 6px; }
+.summary-brief-list { gap: 7px; }
+.top-priorities { margin-bottom: 10px; }
+.top-priorities-head { margin-bottom: 10px; }
+.top-priorities-title { font-size: 1.12rem; }
+.top-priorities-hint { margin: 4px 0 0; }
+.top-priorities-list { gap: 8px; }
+.ai-refine { margin: 8px 0 2px; padding: 12px; }
+.ai-refine.is-soon .ai-refine-sub { margin-top: 2px; }
+.quick-ask { padding: 12px 14px; margin-bottom: 8px; }
+.quick-ask-title { margin: 0 0 8px; }
+.quick-ask-row { margin-bottom: 8px; }
+.result-section { margin-top: 14px; }
+.result-docbar { margin-bottom: 10px; }

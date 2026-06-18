@@ -164,10 +164,6 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
       <div className="result-tab-panel">
         {tab === 'summary' && (
           <>
-            <p className="tab-help">
-              먼저 확인할 3가지만 보고, 더 자세한 내용은 근거·체크 탭에서 볼 수 있어요.
-            </p>
-
             {/* 결과 안에서 찾기 */}
             <ResultSearch result={result} documentText={documentText} onShowInDocument={showInDocument} />
 
@@ -234,16 +230,6 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
                 ))}
               </div>
             </section>
-
-            {/* 4. 자세히 보기 */}
-            <div className="more-actions">
-              <button type="button" className="more-action-button" onClick={() => setTab('evidence')}>
-                근거 자세히 보기
-              </button>
-              <button type="button" className="more-action-button" onClick={() => setTab('check')}>
-                체크리스트 보기
-              </button>
-            </div>
           </>
         )}
 
