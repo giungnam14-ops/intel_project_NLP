@@ -55,6 +55,33 @@ export async function submitFeedback(payload) {
   }
 }
 
+export async function submitMessage(payload) {
+  // User-written review/inquiry. Throws on failure so the form can show an error.
+  const response = await fetch(`${API_BASE_URL}/message`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      kind: payload?.kind === 'review' ? 'review' : 'inquiry',
+      rating: Number(payload?.rating) || 0,
+      message: payload?.message || '',
+      contact: payload?.contact || ''
+    })
+  });
+  if (!response.ok) {
+    let message = '전송하지 못했어요. 잠시 후 다시 시도해 주세요.';
+    try {
+      const errorBody = await response.json();
+      if (errorBody?.detail && typeof errorBody.detail === 'string') {
+        message = errorBody.detail;
+      }
+    } catch {
+      // ignore
+    }
+    throw new Error(message);
+  }
+  return response.json();
+}
+
 export async function fetchAdminFeedback(token) {
   const response = await fetch(`${API_BASE_URL}/admin/feedback`, {
     headers: { 'x-admin-token': token || '' }

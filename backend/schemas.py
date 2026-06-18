@@ -36,6 +36,15 @@ class FeedbackRequest(BaseModel):
     analysis_mode: str = ""
 
 
+class MessageRequest(BaseModel):
+    """A user-written review (후기) or inquiry (문의) for the admin to read."""
+
+    kind: str = "inquiry"  # "review" | "inquiry"
+    rating: int = 0  # 1-5 for reviews; 0 = unset
+    message: str = ""
+    contact: str = ""  # optional, only for inquiry replies
+
+
 class AiKeyPoint(BaseModel):
     title: str
     detail: str

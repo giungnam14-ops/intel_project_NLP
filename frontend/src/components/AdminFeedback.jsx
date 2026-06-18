@@ -47,6 +47,22 @@ function AdminFeedback() {
   const summary = data?.summary;
   const items = Array.isArray(data?.items) ? data.items : [];
   const notes = items.filter((item) => item.note && item.note.trim());
+  const reviews = Array.isArray(data?.reviews) ? data.reviews : [];
+  const inquiries = Array.isArray(data?.inquiries) ? data.inquiries : [];
+
+  const fmtDate = (iso) => {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('ko-KR', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch {
+      return '';
+    }
+  };
+  const stars = (n) => '★'.repeat(Math.max(0, Math.min(5, n))) + '☆'.repeat(5 - Math.max(0, Math.min(5, n)));
 
   return (
     <section className="settings-group">
@@ -151,6 +167,44 @@ function AdminFeedback() {
                     </ul>
                   </div>
                 )}
+
+                <div className="admin-block">
+                  <p className="admin-block-title">사용 후기 ({reviews.length})</p>
+                  {reviews.length > 0 ? (
+                    <ul className="admin-msg-list">
+                      {reviews.slice(0, 50).map((item) => (
+                        <li key={item.id} className="admin-msg-item">
+                          <div className="admin-msg-meta">
+                            {item.rating > 0 && <span className="admin-msg-stars">{stars(item.rating)}</span>}
+                            <span className="admin-msg-date">{fmtDate(item.created_at)}</span>
+                          </div>
+                          <p className="admin-msg-body">{item.message}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="admin-empty">아직 후기가 없어요.</p>
+                  )}
+                </div>
+
+                <div className="admin-block">
+                  <p className="admin-block-title">문의 ({inquiries.length})</p>
+                  {inquiries.length > 0 ? (
+                    <ul className="admin-msg-list">
+                      {inquiries.slice(0, 50).map((item) => (
+                        <li key={item.id} className="admin-msg-item">
+                          <div className="admin-msg-meta">
+                            <span className="admin-msg-date">{fmtDate(item.created_at)}</span>
+                            {item.contact && <span className="admin-msg-contact">{item.contact}</span>}
+                          </div>
+                          <p className="admin-msg-body">{item.message}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="admin-empty">아직 문의가 없어요.</p>
+                  )}
+                </div>
 
                 <p className="admin-foot">집계는 익명 데이터이며 문서 본문은 포함되지 않습니다.</p>
               </div>

@@ -4,7 +4,7 @@ import RecentAnalyses from './RecentAnalyses';
 
 const GUIDE_KEY = 'munyo-guide-dismissed';
 
-function HomeScreen({ onStart, onImport, onCamera, onGoExperience, onGoHistory, history, onRestore, onDeleteRecord }) {
+function HomeScreen({ onStart, onImport, onCamera, onGoExperience, onGoHistory, onGoVoice, history, onRestore, onDeleteRecord }) {
   const [showGuide, setShowGuide] = useState(() => {
     try {
       return localStorage.getItem(GUIDE_KEY) !== '1';
@@ -98,6 +98,15 @@ function HomeScreen({ onStart, onImport, onCamera, onGoExperience, onGoHistory, 
           </article>
         </div>
       </section>
+
+      <button type="button" className="home-voice-cta" onClick={onGoVoice}>
+        <span className="home-voice-emoji" aria-hidden="true">💬</span>
+        <span className="home-voice-text">
+          <span className="home-voice-title">후기·문의 남기기</span>
+          <span className="home-voice-sub">사용 후기나 궁금한 점을 운영자에게 전해보세요.</span>
+        </span>
+        <span className="home-voice-arrow" aria-hidden="true">→</span>
+      </button>
 
       <p className="privacy-note">
         <span aria-hidden="true">🔒</span>

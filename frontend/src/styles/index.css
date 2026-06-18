@@ -3524,3 +3524,137 @@ html.is-large-text { font-size: 18px; }
 @media (max-width: 420px) {
   .admin-stat-row { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---- 홈: 후기·문의 진입 카드 -------------------------------------------- */
+.home-voice-cta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md, 14px);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.home-voice-cta:hover { border-color: #bcd6ff; background: #f7faff; }
+.home-voice-emoji { font-size: 1.4rem; flex-shrink: 0; }
+.home-voice-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.home-voice-title { font-weight: 800; color: var(--c-ink); font-size: 0.95rem; }
+.home-voice-sub { font-size: 0.82rem; color: var(--c-muted); }
+.home-voice-arrow { color: var(--c-primary-strong); font-weight: 800; flex-shrink: 0; }
+
+/* ---- 후기·문의 화면 ----------------------------------------------------- */
+.voice-back {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--c-primary-strong);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.voice-card { padding: 16px; }
+
+.voice-kind-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.voice-kind-tab {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.voice-kind-tab.is-active {
+  background: #eaf2ff;
+  border-color: #bcd6ff;
+  color: var(--c-primary-strong);
+}
+
+.voice-field { margin-bottom: 14px; }
+.voice-label { display: block; margin-bottom: 6px; font-size: 0.84rem; font-weight: 700; color: var(--c-ink); }
+
+.voice-stars { display: flex; gap: 4px; }
+.voice-star {
+  border: none;
+  background: none;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: #d4dae3;
+  cursor: pointer;
+  padding: 2px;
+}
+.voice-star.is-on { color: #f5a524; }
+
+.voice-textarea,
+.voice-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.voice-error {
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: #fff1f0;
+  border: 1px solid #ffd0cc;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.voice-submit { width: 100%; }
+.voice-privacy { margin: 10px 0 0; font-size: 0.78rem; color: var(--c-muted); line-height: 1.5; }
+
+.voice-done { padding: 26px 18px; text-align: center; }
+.voice-done-emoji { font-size: 2.2rem; }
+.voice-done-title { margin: 10px 0 4px; font-weight: 800; font-size: 1.05rem; color: var(--c-ink); }
+.voice-done-sub { margin: 0 0 16px; font-size: 0.88rem; color: var(--c-muted); line-height: 1.5; }
+.voice-done-actions { display: flex; gap: 8px; justify-content: center; }
+.voice-done-actions .ghost-button {
+  padding: 10px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--c-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---- 관리자: 후기/문의 목록 -------------------------------------------- */
+.admin-msg-list { list-style: none; margin: 0; padding: 0; }
+.admin-msg-item {
+  padding: 9px 11px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.admin-msg-item + .admin-msg-item { margin-top: 7px; }
+.admin-msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.admin-msg-stars { color: #f5a524; font-size: 0.86rem; letter-spacing: 1px; }
+.admin-msg-date { font-size: 0.74rem; color: var(--c-muted); }
+.admin-msg-contact {
+  font-size: 0.74rem;
+  color: var(--c-primary-strong);
+  background: #eef2f8;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.admin-msg-body { margin: 0; font-size: 0.88rem; color: var(--c-ink); line-height: 1.55; white-space: pre-wrap; }

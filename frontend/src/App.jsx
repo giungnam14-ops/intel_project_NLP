@@ -8,6 +8,7 @@ import HomeScreen from './components/HomeScreen';
 import ModeSelector from './components/ModeSelector';
 import ResultView from './components/ResultView';
 import SettingsScreen from './components/SettingsScreen';
+import VoiceScreen from './components/VoiceScreen';
 import { addHistoryRecord, clearHistory, deleteHistoryRecord, loadHistory } from './utils/history';
 import { clearFeedback, countFeedback } from './utils/feedback';
 
@@ -267,10 +268,15 @@ function App() {
               onCamera={() => startWithPicker('camera')}
               onGoExperience={() => setTab('experience')}
               onGoHistory={() => setTab('history')}
+              onGoVoice={() => setTab('voice')}
               history={history}
               onRestore={handleRestore}
               onDeleteRecord={handleDeleteRecord}
             />
+          )}
+
+          {tab === 'voice' && (
+            <VoiceScreen onBack={() => setTab('home')} />
           )}
 
           {tab === 'experience' && (

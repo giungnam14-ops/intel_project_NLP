@@ -7,6 +7,7 @@ from backend.ai_refine import ai_available, ai_refine
 from backend.analyzer import analyze_document
 from backend.document_qa import answer_question
 from backend.feedback_store import add_feedback, load_all, summarize
+from backend.message_store import add_message, load_messages
 from backend.schemas import (
     AiAnalyzeRequest,
     AiAnalyzeResponse,
@@ -19,6 +20,7 @@ from backend.schemas import (
     EvidenceItem,
     FeedbackRequest,
     KeyFacts,
+    MessageRequest,
 )
 from guardrails import apply_guardrails
 
@@ -104,10 +106,19 @@ def feedback(request: FeedbackRequest) -> dict:
     return {"ok": True}
 
 
+@app.post("/message")
+def message(request: MessageRequest) -> dict:
+    """Store one user-written review or inquiry for the admin to read."""
+    if not request.message or not request.message.strip():
+        raise HTTPException(status_code=400, detail="내용을 입력해 주세요.")
+    add_message(request.model_dump())
+    return {"ok": True}
+
+
 @app.get("/admin/feedback")
 def admin_feedback(x_admin_token: str | None = Header(default=None)) -> dict:
-    """Admin-only: aggregated feedback for review. Protected by the ADMIN_TOKEN
-    env var (simple token, no account system)."""
+    """Admin-only: aggregated feedback + user reviews/inquiries. Protected by the
+    ADMIN_TOKEN env var (simple token, no account system)."""
     token = os.getenv("ADMIN_TOKEN", "").strip()
     if not token:
         raise HTTPException(
@@ -118,9 +129,17 @@ def admin_feedback(x_admin_token: str | None = Header(default=None)) -> dict:
         raise HTTPException(status_code=401, detail="관리자 인증에 실패했습니다.")
 
     items = load_all()
-    # Newest first, cap how many raw rows are returned.
+    messages = load_messages()
+    # Newest first, capped.
     recent = list(reversed(items))[:500]
-    return {"summary": summarize(items), "items": recent}
+    reviews = list(reversed([m for m in messages if m.get("kind") == "review"]))[:300]
+    inquiries = list(reversed([m for m in messages if m.get("kind") == "inquiry"]))[:300]
+    return {
+        "summary": summarize(items),
+        "items": recent,
+        "reviews": reviews,
+        "inquiries": inquiries,
+    }
 
 
 @app.get("/ai-status")
