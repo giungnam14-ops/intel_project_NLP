@@ -32,7 +32,7 @@ function SampleDocuments({ onTry }) {
                   {open ? '예시 접기' : '예시 문서 보기'}
                 </button>
                 <button type="button" className="sample-try" onClick={() => onTry(sample)}>
-                  체험 분석
+                  이 샘플로 시작하기
                 </button>
               </div>
 
@@ -41,8 +41,8 @@ function SampleDocuments({ onTry }) {
                   <p className="sample-preview-label">예시 문서 (전체)</p>
                   <p className="sample-preview-text">{sample.text}</p>
                   <p className="sample-preview-hint">
-                    💡 ‘체험 분석’을 누르면 결과 화면의 <strong>문서 탭</strong>에서도 전체 문서를 보고,
-                    근거 문장에 형광펜 표시까지 확인할 수 있어요.
+                    💡 ‘이 샘플로 시작하기’를 누르면 분석 화면 입력칸에 이 문서가 그대로 채워져요.
+                    직접 문서를 넣었을 때와 똑같이 <strong>[분석하기]</strong>를 누르면 돼요.
                   </p>
                 </div>
               )}

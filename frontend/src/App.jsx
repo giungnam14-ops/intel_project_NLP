@@ -170,19 +170,20 @@ function App() {
     performAnalysis({ analysisText: text, mode: analysisMode, meta: docMeta, ocrLow: ocrLowQuality, sample: false });
   };
 
-  // "샘플로 체험하기" — fill the sample and analyze immediately.
+  // "샘플로 체험하기" — load the sample into the analyze input so the flow is
+  // identical to entering a document yourself (review the text → press 분석하기).
+  // No auto-analyze, no sample-specific meta/banner.
   const handleTrySample = (sample) => {
     if (!sample?.text) return;
-    const meta = { name: `${sample.title} 샘플`, kind: '샘플', charCount: sample.text.length, previewKind: 'text' };
-    revokePreview();
-    setText(sample.text);
-    setDocMeta(meta);
-    setOcrLowQuality(false);
-    setAnalysisMode(sample.mode || 'quick');
+    setResult(null);
+    setError('');
     setSavedView(false);
-    setInputKey((key) => key + 1);
+    setIsSample(false);
+    clearDoc(); // no file: behave like manually typed text
+    setText(sample.text);
+    setAnalysisMode(sample.mode || 'quick');
+    setInputKey((key) => key + 1); // remount DocumentInput → opens in 'direct' mode with the text
     setTab('analyze');
-    performAnalysis({ analysisText: sample.text, mode: sample.mode || 'quick', meta, ocrLow: false, sample: true });
   };
 
   // Restore a saved record into the result view (no original file preview).
