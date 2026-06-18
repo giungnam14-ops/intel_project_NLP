@@ -2916,9 +2916,18 @@ button, input, textarea { font: inherit; }
 }
 
 .evidence-line.is-active {
-  background: #ffe066;
+  background: #fff3b0;
   box-shadow: 0 0 0 2px #f2c200 inset;
-  font-weight: 600;
+}
+
+.evidence-mark {
+  background: #ffd43b;
+  color: #3a2c00;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 700;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* ---------- Quick ask (result top) ---------- */
