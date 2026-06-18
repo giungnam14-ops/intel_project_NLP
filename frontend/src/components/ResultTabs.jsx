@@ -88,6 +88,19 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
 
   return (
     <div className="result-tabs">
+      {result?.fraud_suspected && (
+        <div className="fraud-banner" role="alert">
+          <span className="fraud-banner-icon" aria-hidden="true">🚨</span>
+          <div>
+            <p className="fraud-banner-title">사기 의심 신호가 있어요</p>
+            <p className="fraud-banner-text">
+              이 문서에는 사기에서 자주 보이는 표현(선입금·개인정보 요구·비현실적 수익 약속 등)이 있어요.
+              송금·계좌·인증번호를 요구하면 절대 응하지 말고, 공식 경로로 다시 확인하세요.
+            </p>
+          </div>
+        </div>
+      )}
+
       {isLongDocument && (
         <div className="longdoc-banner" role="status">
           <span className="longdoc-banner-icon" aria-hidden="true">📚</span>

@@ -35,15 +35,25 @@ function getTemplate(documentType) {
   return TYPE_TEMPLATES[documentType] || TYPE_TEMPLATES.default;
 }
 
-// Friendly checkpoint terms from whatever analysis data is present.
+// Friendly checkpoint terms — prefer the ACTUAL warning labels found (자동결제,
+// 환불 제한, …) so line 2 names concrete findings instead of generic categories.
 function checkpointTerms(result) {
+  const highlights = Array.isArray(result?.highlights) ? result.highlights : [];
+  const labels = [];
+  for (const item of highlights) {
+    const label = item?.label;
+    // '보안 주의' has its own banner; skip it here.
+    if (label && label !== '보안 주의' && !labels.includes(label)) labels.push(label);
+    if (labels.length >= 3) break;
+  }
+  if (labels.length) return labels;
+
   const kf = result?.key_facts || {};
   const terms = [];
   if (Array.isArray(kf.money) && kf.money.length) terms.push('비용');
   if (Array.isArray(kf.dates) && kf.dates.length) terms.push('기한');
   if (Array.isArray(kf.actions) && kf.actions.length) terms.push('해야 할 일');
-  if ((Array.isArray(kf.warnings) && kf.warnings.length)
-    || (Array.isArray(result?.highlights) && result.highlights.length)) {
+  if ((Array.isArray(kf.warnings) && kf.warnings.length) || highlights.length) {
     terms.push('주의 조건');
   }
   return terms.slice(0, 3);

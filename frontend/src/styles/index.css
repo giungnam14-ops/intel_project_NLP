@@ -3689,3 +3689,19 @@ html.is-large-text { font-size: 18px; }
 .quick-ask-row { margin-bottom: 8px; }
 .result-section { margin-top: 14px; }
 .result-docbar { margin-bottom: 10px; }
+
+/* ---- 사기 의심 배너 ----------------------------------------------------- */
+.fraud-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 12px;
+  padding: 13px 14px;
+  border: 1px solid #ffb4ab;
+  border-left: 4px solid #e5484d;
+  border-radius: var(--radius-md, 14px);
+  background: #fff3f1;
+}
+.fraud-banner-icon { font-size: 1.25rem; line-height: 1.2; flex-shrink: 0; }
+.fraud-banner-title { margin: 0 0 3px; font-size: 0.95rem; font-weight: 800; color: #b42318; }
+.fraud-banner-text { margin: 0; font-size: 0.88rem; line-height: 1.55; color: #7a271f; }

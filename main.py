@@ -79,6 +79,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         security_notice=result.get("security_notice", False),
         long_document=result.get("long_document", False),
         processing_note=result.get("processing_note", None),
+        fraud_suspected=result.get("fraud_suspected", False),
     )
 
 

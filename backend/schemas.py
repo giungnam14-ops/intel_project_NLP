@@ -141,3 +141,5 @@ class AnalyzeResponse(BaseModel):
     # mode (key-sentence focused). processing_note explains it to the user.
     long_document: bool = False
     processing_note: str | None = None
+    # True when scam/fraud red-flag phrasing was detected (shown as a banner).
+    fraud_suspected: bool = False
