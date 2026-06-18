@@ -1,3 +1,6 @@
 fastapi
 uvicorn
 pydantic
+# Optional: enables the /ai-analyze hybrid deep-analysis endpoint. The base app
+# runs fine without it (the endpoint degrades to available=False).
+anthropic

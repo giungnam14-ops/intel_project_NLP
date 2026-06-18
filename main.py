@@ -3,9 +3,13 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.ai_refine import ai_available, ai_refine
 from backend.analyzer import analyze_document
 from backend.document_qa import answer_question
 from backend.schemas import (
+    AiAnalyzeRequest,
+    AiAnalyzeResponse,
+    AiKeyPoint,
     AnalyzeRequest,
     AnalyzeResponse,
     AnalyzeCard,
@@ -87,4 +91,36 @@ def ask(request: AskRequest) -> AskResponse:
         confidence=result.get("confidence", "low"),
         evidence=[EvidenceItem(**item) for item in result.get("evidence", [])],
         suggested_followups=result.get("suggested_followups", []),
+    )
+
+
+@app.get("/ai-status")
+def ai_status() -> dict:
+    """Lightweight check (no LLM call) so the UI can hide the opt-in AI feature
+    until an operator configures a key."""
+    return {"available": ai_available()}
+
+
+@app.post("/ai-analyze", response_model=AiAnalyzeResponse)
+def ai_analyze(request: AiAnalyzeRequest) -> AiAnalyzeResponse:
+    """Optional AI deep-analysis (hybrid mode).
+
+    Additive and isolated: when the feature is not configured (no SDK / key) the
+    response carries ``available=False`` with a friendly message instead of an
+    error, so the rule-based flow is never affected.
+    """
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="text is required")
+
+    result = ai_refine(request.text)
+
+    return AiAnalyzeResponse(
+        available=bool(result.get("available")),
+        error=result.get("error"),
+        summary=result.get("summary", ""),
+        key_points=[AiKeyPoint(**point) for point in result.get("key_points", [])],
+        watch_outs=result.get("watch_outs", []),
+        plain_explanation=result.get("plain_explanation", ""),
+        model=result.get("model"),
+        truncated=bool(result.get("truncated", False)),
     )

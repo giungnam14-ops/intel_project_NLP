@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AiRefine from './AiRefine';
 import ConfirmChecklist from './ConfirmChecklist';
 import DeadlineExport from './DeadlineExport';
 import DocumentPreview from './DocumentPreview';
@@ -188,6 +189,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
               documentText={documentText}
               onShowInDocument={showInDocument}
             />
+
+            {/* AI 정밀 분석 (선택) — 규칙 기반 위에 더 깊은 분석 */}
+            <AiRefine documentText={documentText} onShowInDocument={showInDocument} />
 
             {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">

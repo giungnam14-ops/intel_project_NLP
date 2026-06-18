@@ -17,6 +17,35 @@ class AskRequest(BaseModel):
     question: str = ""
 
 
+class AiAnalyzeRequest(BaseModel):
+    text: str
+    filename: str = ""
+
+
+class AiKeyPoint(BaseModel):
+    title: str
+    detail: str
+    quote: str = ""
+    level: str = "medium"
+
+
+class AiAnalyzeResponse(BaseModel):
+    """Optional AI deep-analysis result. ``available`` is False when the feature
+    is not configured (no key / SDK) or the call failed; the UI then shows a
+    friendly note instead of an error."""
+
+    model_config = ConfigDict(extra="allow")
+
+    available: bool = False
+    error: str | None = None
+    summary: str = ""
+    key_points: list[AiKeyPoint] = []
+    watch_outs: list[str] = []
+    plain_explanation: str = ""
+    model: str | None = None
+    truncated: bool = False
+
+
 class EvidenceItem(BaseModel):
     source_text: str
     label: str

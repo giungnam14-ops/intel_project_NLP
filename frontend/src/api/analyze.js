@@ -34,6 +34,45 @@ export async function analyzeDocument(text, ocrLowQuality = false, filename = ''
   return response.json();
 }
 
+export async function aiStatus() {
+  // Cheap check (no LLM call) used to hide the opt-in AI feature until a key is
+  // configured. Any failure → treat as unavailable so the free flow stays clean.
+  try {
+    const response = await fetch(`${API_BASE_URL}/ai-status`);
+    if (!response.ok) return { available: false };
+    return await response.json();
+  } catch {
+    return { available: false };
+  }
+}
+
+export async function aiAnalyzeDocument(text, filename = '') {
+  const response = await fetch(`${API_BASE_URL}/ai-analyze`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text, filename: filename || '' })
+  });
+
+  if (!response.ok) {
+    // Treat transport/server errors as "unavailable" so the UI shows a friendly
+    // note instead of breaking the rule-based result screen.
+    let message = 'AI 정밀 분석을 불러오지 못했어요.';
+    try {
+      const errorBody = await response.json();
+      if (errorBody?.detail && typeof errorBody.detail === 'string') {
+        message = errorBody.detail;
+      }
+    } catch {
+      // ignore
+    }
+    return { available: false, error: message };
+  }
+
+  return response.json();
+}
+
 export async function askDocument(text, question) {
   const response = await fetch(`${API_BASE_URL}/ask`, {
     method: 'POST',
