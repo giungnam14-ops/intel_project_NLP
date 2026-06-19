@@ -64,21 +64,18 @@ function AiRefine({ documentText = '', onShowInDocument }) {
   // it's planned. Flip the key on later and it becomes the live button below.
   if (!enabled) {
     return (
-      <section className="ai-refine is-soon">
-        <div className="ai-refine-head">
-          <div>
-            <p className="ai-refine-title">
-              <span className="ai-refine-spark" aria-hidden="true">✨</span> AI 정밀 분석
-              <span className="ai-refine-soon-badge">준비 중</span>
-            </p>
-            <p className="ai-refine-sub">
-              곧 AI가 문서를 더 깊이 읽고, 핵심 문장을 직접 짚어 쉽게 설명해 드릴 예정이에요.
-            </p>
-          </div>
-          <button type="button" className="primary-button ai-refine-run" disabled>
-            준비 중
-          </button>
+      <section className="ai-refine is-pro">
+        <div className="ai-pro-top">
+          <span className="ai-pro-badge">PRO</span>
+          <p className="ai-pro-title"><span aria-hidden="true">✨</span> AI 정밀 분석</p>
         </div>
+        <p className="ai-pro-lead">규칙 기반 요약을 넘어, AI가 문서를 더 깊이 읽어드려요.</p>
+        <ul className="ai-pro-bullets">
+          <li>더 자연스럽고 깊은 요약</li>
+          <li>핵심 문장을 직접 짚어 쉬운 말로 설명</li>
+          <li>사기·독소조항 정밀 탐지</li>
+        </ul>
+        <button type="button" className="ai-pro-cta" disabled>프리미엄에서 곧 제공돼요</button>
       </section>
     );
   }
@@ -89,6 +86,7 @@ function AiRefine({ documentText = '', onShowInDocument }) {
         <div>
           <p className="ai-refine-title">
             <span className="ai-refine-spark" aria-hidden="true">✨</span> AI 정밀 분석
+            <span className="ai-pro-badge sm">PRO</span>
           </p>
           <p className="ai-refine-sub">
             규칙 기반 요약 위에, AI가 문서를 더 깊이 읽고 핵심 문장을 골라 설명해요.

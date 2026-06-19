@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ActionItems from './ActionItems';
 import AiRefine from './AiRefine';
 import ConfirmChecklist from './ConfirmChecklist';
 import DeadlineExport from './DeadlineExport';
@@ -198,6 +199,9 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
               documentText={documentText}
               onShowInDocument={showInDocument}
             />
+
+            {/* 앞으로 해야 할 일 (이행 의무 + 기한) */}
+            <ActionItems result={result} onShowInDocument={showInDocument} />
 
             {/* AI 정밀 분석 (선택) — 규칙 기반 위에 더 깊은 분석 */}
             <AiRefine documentText={documentText} onShowInDocument={showInDocument} />

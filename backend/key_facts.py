@@ -79,6 +79,15 @@ def empty_facts() -> dict:
     return {"money": [], "dates": [], "actions": [], "warnings": []}
 
 
+def extract_deadline(sentence: str) -> str:
+    """Return the first date/deadline-looking substring in a sentence, or ''."""
+    for pattern in _DATE_RES:
+        match = pattern.search(sentence)
+        if match:
+            return re.sub(r"\s+", " ", match.group()).strip()
+    return ""
+
+
 def _money_label(sentence: str) -> str:
     if "위약금" in sentence:
         return "위약금"

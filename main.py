@@ -76,6 +76,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         blocked_reason=result.get("blocked_reason", None),
         highlights=result.get("highlights", []),
         key_facts=result.get("key_facts", None) or KeyFacts(),
+        action_items=result.get("action_items", []),
         security_notice=result.get("security_notice", False),
         long_document=result.get("long_document", False),
         processing_note=result.get("processing_note", None),

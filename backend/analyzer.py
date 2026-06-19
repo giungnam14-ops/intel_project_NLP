@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from backend.action_items import extract_action_items
 from backend.classifier import classify_document
 from backend.checklist import generate_checklist
 from backend.explainer import explain_item
@@ -126,6 +127,7 @@ def analyze_document(text: str, filename: str = "") -> dict:
 
     insights = build_insights(cleaned)
     fraud = detect_fraud(cleaned)
+    action_items = extract_action_items(cleaned)
 
     summary = _build_summary(
         document_type, filename_is_contract, insights["highlights"], insights["key_facts"], fraud
@@ -161,4 +163,5 @@ def analyze_document(text: str, filename: str = "") -> dict:
         "highlights": highlights,
         "key_facts": insights["key_facts"],
         "fraud_suspected": fraud["suspected"],
+        "action_items": action_items,
     }

@@ -108,6 +108,15 @@ class KeyFacts(BaseModel):
     warnings: list[KeyFactItem] = []
 
 
+class ActionItem(BaseModel):
+    """A concrete to-do extracted from the document (obligation + optional deadline)."""
+
+    task: str
+    deadline: str = ""
+    source_text: str = ""
+    level: str = "normal"
+
+
 class Highlight(BaseModel):
     """A source sentence flagged as important, with severity and reason."""
 
@@ -134,6 +143,8 @@ class AnalyzeResponse(BaseModel):
     # Optional, additive fields (Stage 1: highlights & key facts).
     highlights: list[Highlight] = []
     key_facts: KeyFacts = Field(default_factory=KeyFacts)
+    # Concrete to-dos the user must act on (obligations + deadlines).
+    action_items: list[ActionItem] = []
     # True when the document contained AI-instruction-manipulating text that was
     # surfaced as a '보안 주의' highlight instead of hard-blocking the analysis.
     security_notice: bool = False

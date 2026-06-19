@@ -3738,3 +3738,77 @@ button:active:not(:disabled) { transform: scale(0.97); }
   button:active:not(:disabled),
   .nav-item:active { transform: none; }
 }
+
+/* ---- 앞으로 해야 할 일 -------------------------------------------------- */
+.action-items {
+  margin: 10px 0;
+  padding: 14px;
+  border: 1px solid #c8ecd3;
+  border-radius: var(--radius-md, 14px);
+  background: linear-gradient(180deg, #f1fbf4 0%, #ffffff 100%);
+}
+.action-items-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.action-items-icon { font-size: 1.2rem; flex-shrink: 0; }
+.action-items-title { margin: 0; font-size: 0.98rem; font-weight: 800; color: var(--c-ink); }
+.action-items-sub { margin: 2px 0 0; font-size: 0.82rem; color: var(--c-muted); }
+
+.action-items-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.action-item {
+  padding: 10px 11px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  border-left: 3px solid #9aa4b2;
+}
+.action-item.is-high { border-left-color: #1a7f43; }
+.action-item.is-done { opacity: 0.55; }
+
+.action-item-main { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.action-item-main input {
+  width: 20px; height: 20px; margin-top: 1px;
+  accent-color: #1a7f43; flex-shrink: 0; cursor: pointer;
+}
+.action-item-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.action-item-task { font-weight: 700; color: var(--c-ink); font-size: 0.93rem; }
+.is-done .action-item-task { text-decoration: line-through; }
+.action-item-deadline {
+  align-self: flex-start;
+  font-size: 0.76rem; font-weight: 700; color: #b4540a;
+  background: #fff3e6; border: 1px solid #ffd9b0;
+  padding: 1px 8px; border-radius: 999px;
+}
+.action-item-link { margin: 8px 0 0 30px; }
+
+/* ---- AI 정밀 분석 — PRO 업셀 ------------------------------------------- */
+.ai-refine.is-pro {
+  margin: 10px 0 2px;
+  padding: 16px;
+  border: 1px solid #ead9a6;
+  border-radius: var(--radius-md, 14px);
+  background:
+    radial-gradient(120% 80% at 0% 0%, #fff7e6 0%, transparent 60%),
+    linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+  box-shadow: var(--shadow-soft);
+}
+.ai-pro-top { display: flex; align-items: center; gap: 8px; }
+.ai-pro-badge {
+  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.04em;
+  color: #7a5400; padding: 2px 9px; border-radius: 999px;
+  background: linear-gradient(135deg, #ffe08a 0%, #f5b94d 100%);
+  box-shadow: 0 2px 6px rgba(200, 150, 30, 0.3);
+}
+.ai-pro-badge.sm { font-size: 0.64rem; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+.ai-pro-title { margin: 0; font-size: 1rem; font-weight: 800; color: var(--c-ink); }
+.ai-pro-lead { margin: 9px 0 8px; font-size: 0.88rem; color: var(--c-ink-soft); line-height: 1.5; }
+.ai-pro-bullets { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.ai-pro-bullets li { position: relative; padding-left: 22px; font-size: 0.88rem; color: var(--c-ink); line-height: 1.5; }
+.ai-pro-bullets li::before {
+  content: "✓"; position: absolute; left: 4px; top: 0;
+  color: #1a7f43; font-weight: 900;
+}
+.ai-pro-cta {
+  width: 100%; margin-top: 14px; padding: 11px;
+  border: 1px dashed #e0c98a; border-radius: var(--radius-sm);
+  background: #fffaf0; color: #8a6500; font-weight: 800; font-size: 0.9rem;
+  cursor: default;
+}
