@@ -3705,3 +3705,36 @@ html.is-large-text { font-size: 18px; }
 .fraud-banner-icon { font-size: 1.25rem; line-height: 1.2; flex-shrink: 0; }
 .fraud-banner-title { margin: 0 0 3px; font-size: 0.95rem; font-weight: 800; color: #b42318; }
 .fraud-banner-text { margin: 0; font-size: 0.88rem; line-height: 1.55; color: #7a271f; }
+
+/* ---- 앱 느낌 폴리시 (터치 피드백 · 세이프에어리어 · 스크롤) -------------- */
+html {
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+body {
+  overscroll-behavior-y: none; /* 앱처럼 위/아래 당김 시 배경 노출 방지 */
+}
+
+button {
+  touch-action: manipulation; /* 더블탭 줌 지연 제거 */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 누를 때 살짝 들어가는 피드백 (비활성 버튼 제외) */
+button:active:not(:disabled) { transform: scale(0.97); }
+.nav-item:active { transform: scale(0.9); }
+.feature-card:active,
+.recent-card:active,
+.sample-card:active { transform: scale(0.995); }
+
+/* 상단 노치(세이프에어리어) 여백 */
+.app-main {
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+}
+.bottom-nav { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+
+@media (prefers-reduced-motion: reduce) {
+  button:active:not(:disabled),
+  .nav-item:active { transform: none; }
+}
