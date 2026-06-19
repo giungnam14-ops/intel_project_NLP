@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { aiAnalyzeDocument, aiStatus } from '../api/analyze';
 
 const LEVEL_LABEL = {
@@ -7,12 +7,13 @@ const LEVEL_LABEL = {
   low: '참고'
 };
 
-function AiRefine({ documentText = '', onShowInDocument }) {
+function AiRefine({ documentText = '', autoRun = false, onShowInDocument }) {
   // enabled: null = unknown (checking), false = feature off (hide), true = show.
   const [enabled, setEnabled] = useState(null);
   const [status, setStatus] = useState('idle'); // idle | loading | done
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const autoRunRef = useRef(false);
 
   const canRun = Boolean((documentText || '').trim());
 
@@ -48,6 +49,16 @@ function AiRefine({ documentText = '', onShowInDocument }) {
       setStatus('idle');
     }
   };
+
+  // Auto-run once when the user opted into 고급 분석 at the start and the
+  // feature is enabled. (Keyed remount per result resets autoRunRef.)
+  useEffect(() => {
+    if (autoRun && enabled && canRun && status === 'idle' && !autoRunRef.current) {
+      autoRunRef.current = true;
+      run();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun, enabled, canRun, status]);
 
   const showQuote = (point) => {
     if (!onShowInDocument || !point?.quote) return;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { analyzeDocument } from './api/analyze';
+import AdvancedAnalysisOption from './components/AdvancedAnalysisOption';
 import BottomNav from './components/BottomNav';
 import DocumentInput from './components/DocumentInput';
 import ExperienceScreen from './components/ExperienceScreen';
@@ -66,6 +67,8 @@ function App() {
   const [isSample, setIsSample] = useState(false);
   const [currentResultId, setCurrentResultId] = useState(null);
   const [feedbackCount, setFeedbackCount] = useState(() => countFeedback());
+  // User opted into AI 고급 분석(PRO) at the start → auto-run it on the result.
+  const [wantAdvanced, setWantAdvanced] = useState(false);
 
   const hasResult = Boolean(result);
 
@@ -314,6 +317,7 @@ function App() {
                   analysisMode={analysisMode}
                   isSample={isSample}
                   resultId={currentResultId}
+                  autoAdvanced={wantAdvanced}
                   onFeedbackSaved={refreshFeedbackCount}
                   onNew={handleNewAnalysis}
                 />
@@ -326,6 +330,7 @@ function App() {
                     </div>
                   )}
                   <ModeSelector value={analysisMode} onChange={setAnalysisMode} />
+                  <AdvancedAnalysisOption advanced={wantAdvanced} onToggle={setWantAdvanced} />
                   <DocumentInput
                     key={inputKey}
                     text={text}

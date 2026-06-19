@@ -425,7 +425,7 @@ function DocumentInput({
             </button>
           </div>
 
-          <p className="helper-text camera-note">
+          <p className="helper-text input-cam-note">
             사진 찍어 분석하기를 누르면 앱 안에서 카메라가 열려요. 카메라 권한을 허용해 주세요.
             카메라를 쓸 수 없으면 파일 가져오기로 사진을 선택할 수 있어요.
           </p>

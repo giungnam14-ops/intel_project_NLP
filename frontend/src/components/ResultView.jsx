@@ -10,6 +10,7 @@ function ResultView({
   analysisMode = 'quick',
   isSample = false,
   resultId = null,
+  autoAdvanced = false,
   onFeedbackSaved,
   onNew
 }) {
@@ -36,6 +37,8 @@ function ResultView({
         documentText={documentText}
         documentMeta={documentMeta}
         analysisMode={analysisMode}
+        resultId={resultId}
+        autoAdvanced={autoAdvanced}
       />
 
       <ResultFeedback

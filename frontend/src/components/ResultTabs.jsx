@@ -36,7 +36,7 @@ const TYPE_BADGE = {
   paper: '논문'
 };
 
-function ResultTabs({ result, shortSource, documentText, documentMeta, analysisMode = 'quick' }) {
+function ResultTabs({ result, shortSource, documentText, documentMeta, analysisMode = 'quick', resultId = null, autoAdvanced = false }) {
   const [tab, setTab] = useState('summary');
   const [cardsExpanded, setCardsExpanded] = useState(false);
   const [quickAsk, setQuickAsk] = useState(null); // { q, seq }
@@ -204,7 +204,12 @@ function ResultTabs({ result, shortSource, documentText, documentMeta, analysisM
             <ActionItems result={result} onShowInDocument={showInDocument} />
 
             {/* AI 정밀 분석 (선택) — 규칙 기반 위에 더 깊은 분석 */}
-            <AiRefine documentText={documentText} onShowInDocument={showInDocument} />
+            <AiRefine
+              key={resultId || 'ai'}
+              documentText={documentText}
+              autoRun={autoAdvanced}
+              onShowInDocument={showInDocument}
+            />
 
             {/* 3. 궁금한 점이 있나요? */}
             <section className="quick-ask">

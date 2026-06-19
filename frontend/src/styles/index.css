@@ -456,13 +456,15 @@ button, input, textarea { font: inherit; }
   margin: 10px 0 0;
 }
 
-.camera-note {
+/* Input-panel camera hint (light background → needs dark, readable text). */
+.input-cam-note {
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   background: var(--c-surface-2);
   border: 1px solid var(--c-line);
   line-height: 1.5;
+  color: var(--c-ink-soft);
 }
 
 .helper-strong {
@@ -3827,3 +3829,41 @@ button:active:not(:disabled) { transform: scale(0.97); }
 .top-priority-why strong { color: #b4540a; margin-right: 4px; font-weight: 800; }
 .top-priority-tip { border-left-color: #9fd9b4; }
 .top-priority-tip strong { color: #1a7f43; margin-right: 4px; font-weight: 800; }
+
+/* ---- 분석 시작 단계: AI 고급 분석(PRO) 옵션 ---------------------------- */
+.adv-option {
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border: 1px solid #ead9a6;
+  border-radius: var(--radius-md, 14px);
+  background:
+    radial-gradient(120% 80% at 0% 0%, #fff7e6 0%, transparent 60%),
+    linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+}
+.adv-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+}
+.adv-option-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.adv-option-title { font-weight: 800; font-size: 0.94rem; color: var(--c-ink); }
+.adv-option-sub { font-size: 0.82rem; color: var(--c-muted); line-height: 1.5; }
+
+.adv-option.is-locked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.adv-option-lock {
+  flex-shrink: 0;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #8a6500;
+  background: #fffaf0;
+  border: 1px dashed #e0c98a;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
