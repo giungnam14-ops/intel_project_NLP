@@ -3867,3 +3867,29 @@ button:active:not(:disabled) { transform: scale(0.97); }
   padding: 4px 10px;
   border-radius: 999px;
 }
+
+/* ---- 데스크톱·태블릿: 넓고 세련된 레이아웃 (모바일은 그대로) ---------- */
+@media (min-width: 760px) {
+  .app-frame { max-width: 880px; }
+  .bottom-nav { max-width: 880px; }
+  .app-main {
+    padding-left: 28px;
+    padding-right: 28px;
+    gap: 22px;
+  }
+
+  /* 좌우 폭을 활용해 카드들을 여러 열로 → 세로 길이 감소, 더 균형 잡힌 화면 */
+  .feature-grid { grid-template-columns: repeat(3, 1fr); }
+  .doctype-list { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .sample-list { display: grid; grid-template-columns: repeat(2, 1fr); align-items: start; }
+  .recent-list { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* 히어로/요약 같은 가독성 중요한 텍스트는 너무 길어지지 않게 */
+  .home-lead, .summary-brief-list, .ai-pro-lead { max-width: 640px; }
+}
+
+@media (min-width: 1040px) {
+  .app-frame { max-width: 960px; }
+  .bottom-nav { max-width: 960px; }
+}
