@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { aiAnalyzeDocument, aiStatus } from '../api/analyze';
+import { aiAnalyzeDocument } from '../api/analyze';
 
 const LEVEL_LABEL = {
   high: '꼭 확인',
@@ -7,29 +7,15 @@ const LEVEL_LABEL = {
   low: '참고'
 };
 
+// PRO feature, always available to use now (server runs it with the API token).
+// Billing/limits come later; for now anyone can run it.
 function AiRefine({ documentText = '', autoRun = false, onShowInDocument }) {
-  // enabled: null = unknown (checking), false = feature off (hide), true = show.
-  const [enabled, setEnabled] = useState(null);
   const [status, setStatus] = useState('idle'); // idle | loading | done
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const autoRunRef = useRef(false);
 
   const canRun = Boolean((documentText || '').trim());
-
-  useEffect(() => {
-    let cancelled = false;
-    aiStatus()
-      .then((result) => {
-        if (!cancelled) setEnabled(Boolean(result?.available));
-      })
-      .catch(() => {
-        if (!cancelled) setEnabled(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const run = async () => {
     if (!canRun || status === 'loading') return;
@@ -50,15 +36,15 @@ function AiRefine({ documentText = '', autoRun = false, onShowInDocument }) {
     }
   };
 
-  // Auto-run once when the user opted into 고급 분석 at the start and the
-  // feature is enabled. (Keyed remount per result resets autoRunRef.)
+  // Auto-run once when the user opted into 고급 분석 at the start.
+  // (Keyed remount per result resets autoRunRef.)
   useEffect(() => {
-    if (autoRun && enabled && canRun && status === 'idle' && !autoRunRef.current) {
+    if (autoRun && canRun && status === 'idle' && !autoRunRef.current) {
       autoRunRef.current = true;
       run();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoRun, enabled, canRun, status]);
+  }, [autoRun, canRun, status]);
 
   const showQuote = (point) => {
     if (!onShowInDocument || !point?.quote) return;
@@ -70,26 +56,6 @@ function AiRefine({ documentText = '', autoRun = false, onShowInDocument }) {
       quality: 'normal'
     });
   };
-
-  // Feature not enabled yet (no key) → show a "coming soon" teaser so users know
-  // it's planned. Flip the key on later and it becomes the live button below.
-  if (!enabled) {
-    return (
-      <section className="ai-refine is-pro">
-        <div className="ai-pro-top">
-          <span className="ai-pro-badge">PRO</span>
-          <p className="ai-pro-title"><span aria-hidden="true">✨</span> AI 정밀 분석</p>
-        </div>
-        <p className="ai-pro-lead">규칙 기반 요약을 넘어, AI가 문서를 더 깊이 읽어드려요.</p>
-        <ul className="ai-pro-bullets">
-          <li>더 자연스럽고 깊은 요약</li>
-          <li>핵심 문장을 직접 짚어 쉬운 말로 설명</li>
-          <li>사기·독소조항 정밀 탐지</li>
-        </ul>
-        <button type="button" className="ai-pro-cta" disabled>프리미엄에서 곧 제공돼요</button>
-      </section>
-    );
-  }
 
   return (
     <section className="ai-refine">
