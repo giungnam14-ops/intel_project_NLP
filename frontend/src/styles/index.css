@@ -3812,3 +3812,18 @@ button:active:not(:disabled) { transform: scale(0.97); }
   background: #fffaf0; color: #8a6500; font-weight: 800; font-size: 0.9rem;
   cursor: default;
 }
+
+/* ---- 가장 먼저 볼 것: 왜 중요 + 추천 ----------------------------------- */
+.top-priority-why,
+.top-priority-tip {
+  display: block;
+  margin-top: 8px;
+  padding-left: 10px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--c-ink-soft);
+  border-left: 2px solid var(--c-line);
+}
+.top-priority-why strong { color: #b4540a; margin-right: 4px; font-weight: 800; }
+.top-priority-tip { border-left-color: #9fd9b4; }
+.top-priority-tip strong { color: #1a7f43; margin-right: 4px; font-weight: 800; }

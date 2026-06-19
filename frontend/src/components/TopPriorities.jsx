@@ -1,80 +1,80 @@
 import { buildEvidence } from '../utils/evidence';
 import { MODE_THEME_PRIORITY } from '../utils/modes';
 
-// Friendly, sentence-style copy per theme. Titles read as plain sentences so a
-// first-time user understands them without knowing the internal keywords.
+// Per-theme copy. Each item explains WHY it matters (자주 놓치지만 중요한 이유)
+// and WHAT to do (이렇게 하세요) — not just "이런 조항이 있어요".
 const THEMES = {
   refund: {
     emoji: '💳',
-    title: '해지·환불 조건을 확인해야 해요',
-    desc: '환불·해지 조건이 제한될 수 있어요.',
-    why: '환불 가능 기간이나 해지 조건이 제한될 수 있으니 먼저 확인하세요.'
+    title: '환불·해지 조건을 꼭 확인하세요',
+    point: '환불이 아예 안 되거나, 정해진 기간(예: 7일) 안에서만 가능한 경우가 많아요.',
+    action: '환불 가능 기간·조건을 메모해 두고, 기간이 지나기 전에 신청하세요.'
   },
   cancel: {
     emoji: '🚪',
-    title: '해지/탈회 조건을 확인해야 해요',
-    desc: '해지·탈퇴 조건이 있어요.',
-    why: '해지·탈퇴 절차나 제한 조건이 있는지 확인하세요.'
+    title: '해지가 까다로울 수 있어요',
+    point: '자동으로 연장되거나, 해지할 때 위약금·별도 절차가 붙는 경우가 흔해요.',
+    action: '해지 방법과 위약금 여부를 미리 확인하고, 자동연장이면 갱신일 전에 해지하세요.'
   },
   privacy: {
     emoji: '🔒',
-    title: '개인정보 제공 조건이 있어요',
-    desc: '개인정보 제공 관련 내용이 있어요.',
-    why: '개인정보가 누구에게 어디까지 제공되는지 확인하세요.'
+    title: '개인정보가 제3자에게 갈 수 있어요',
+    point: '내 정보가 누구에게·어디까지·왜 제공되는지 모르고 동의하기 쉬워요.',
+    action: '제공 대상과 범위를 확인하고, 꼭 필요하지 않은 항목은 동의를 다시 생각하세요.'
   },
   money: {
     emoji: '💰',
-    title: '비용이나 비율 조건이 있어요',
-    desc: '비용·수수료·비율 조건이 있어요.',
-    why: '비용 또는 비율과 관련된 조건이 있습니다. 실제 부담 여부를 확인하세요.'
+    title: '예상 못 한 비용이 나갈 수 있어요',
+    point: '자동결제·수수료·위약금처럼 미리 인지하지 못한 돈이 빠져나갈 수 있어요.',
+    action: '총 얼마를, 언제, 어떤 조건에서 내야 하는지 숫자로 확인하세요.'
   },
   liability: {
     emoji: '⚠️',
-    title: '책임이 제한될 수 있어요',
-    desc: '책임 제한 조건이 있어요.',
-    why: '문제가 생겨도 사업자 책임이 제한되는 조건이 있는지 확인하세요.'
+    title: '문제가 생겨도 책임을 안 질 수 있어요',
+    point: '사고·손해가 나도 사업자 책임이 면제·제한되는 조항이 자주 들어가요.',
+    action: '어떤 경우에 책임을 안 지는지 확인하고, 중요하면 보장 범위를 따로 물어보세요.'
   },
   restriction: {
     emoji: '🚫',
-    title: '이용이 제한될 수 있어요',
-    desc: '이용 제한 조건이 있어요.',
-    why: '특정 조건에서 이용이 제한될 수 있으니 제한 조건을 확인하세요.'
+    title: '내 권리가 제한될 수 있어요',
+    point: '기간·자격·만기 같은 특정 조건에 걸리면 서비스나 대출 같은 권리를 못 쓸 수 있어요.',
+    action: '내가 그 제한 조건에 해당하는지 먼저 확인하고, 해당되면 가입·계약 전에 문의하세요.'
   },
   notice: {
     emoji: '📣',
-    title: '사전 안내 없이 적용될 수 있어요',
-    desc: '사전 고지 없이 적용될 수 있어요.',
-    why: '사전 고지 없이 조건이 바뀌거나 적용될 수 있으니 확인하세요.'
+    title: '예고 없이 조건이 바뀔 수 있어요',
+    point: '사전 안내 없이 요금이나 조건이 변경·적용될 수 있어요.',
+    action: '변경을 어떻게 통지받는지 확인하고, 알림을 켜두거나 주기적으로 점검하세요.'
   },
   action: {
     emoji: '✅',
     title: '직접 해야 할 일이 있어요',
-    desc: '직접 처리할 내용이 있어요.',
-    why: '서명·제출·동의처럼 사용자가 직접 처리해야 할 내용이 있습니다.'
+    point: '서명·제출·신청·동의처럼 내가 직접 안 하면 불이익이 생길 수 있어요.',
+    action: '해야 할 일과 기한을 메모하고, 늦지 않게 처리하세요.'
   },
   date: {
     emoji: '📅',
-    title: '기한이나 마감이 있어요',
-    desc: '확인할 기한이 있어요.',
-    why: '신청·제출·환불 기한을 놓치지 않도록 날짜를 확인하세요.'
+    title: '기한을 놓치면 안 돼요',
+    point: '신청·제출·환불 기한을 넘기면 권리를 잃을 수 있어요.',
+    action: '기한을 캘린더에 등록하고 미리 알림을 설정하세요.'
   },
   unfair: {
     emoji: '❗',
-    title: '불리한 조건이 있을 수 있어요',
-    desc: '불리한 조건이 있을 수 있어요.',
-    why: '불리하게 작용할 수 있는 조건이 있는지 확인하세요.'
+    title: '나에게 불리한 조건일 수 있어요',
+    point: '한쪽(주로 소비자)에게 일방적으로 불리하게 작용할 수 있는 조항이에요.',
+    action: '이 조건이 실제로 나에게 어떻게 적용되는지 확인하고, 애매하면 문의하세요.'
   },
   special: {
     emoji: '📌',
-    title: '특약 사항을 확인하세요',
-    desc: '특별한 약속이 있을 수 있어요.',
-    why: '일반 조건과 다른 특별한 약속(특약)이 있는지 확인하세요.'
+    title: '특약을 꼭 확인하세요',
+    point: '특약은 일반 조건보다 우선 적용돼, 바로 여기서 손해가 나기 쉬워요.',
+    action: '특약을 한 줄씩 확인하고, 불리하면 수정·삭제를 요청하세요.'
   },
   default: {
     emoji: '⭐',
-    title: '문서에서 꼭 확인할 내용이에요',
-    desc: '핵심 조건을 확인하세요.',
-    why: '문서의 핵심 조건을 확인하세요.'
+    title: '꼭 확인할 핵심이에요',
+    point: '사람들이 자주 지나치지만 실제로는 중요한 조건이에요.',
+    action: '내용을 한 번 더 읽어보고, 모르면 담당자에게 물어보세요.'
   }
 };
 
@@ -82,28 +82,33 @@ const THEMES = {
 const CONTRACT_OVERRIDES = {
   money: {
     title: '금액 조건을 확인하세요',
-    desc: '계약금·잔금·보증금 등 돈 조건이 있어요.',
-    why: '계약금, 잔금, 보증금, 수수료처럼 돈과 관련된 조건이 있는지 확인하세요.'
+    point: '계약금·잔금·보증금·위약금 등 큰돈이 걸린 조건이에요.',
+    action: '각 금액과 납부 시점·조건을 정확히 확인하세요.'
   },
   date: {
     title: '계약 기간을 확인하세요',
-    desc: '시작일·종료일·갱신 조건이 있어요.',
-    why: '계약 시작일, 종료일, 갱신 조건을 확인하세요.'
+    point: '시작·종료·갱신 시점에 따라 권리와 의무가 달라져요.',
+    action: '시작일·종료일·자동갱신 여부를 확인하세요.'
   },
   cancel: {
-    title: '해지/위약 조건을 확인하세요',
-    desc: '해지 시 불이익이 있을 수 있어요.',
-    why: '계약을 해지할 때 불이익이나 위약금이 있는지 확인하세요.'
+    title: '해지·위약 조건을 확인하세요',
+    point: '중도 해지하면 위약금이나 불이익이 클 수 있어요.',
+    action: '해지 절차와 위약금 계산 방식을 미리 확인하세요.'
   },
   refund: {
-    title: '해지/위약 조건을 확인하세요',
-    desc: '해지 시 불이익이 있을 수 있어요.',
-    why: '계약을 해지할 때 불이익이나 위약금이 있는지 확인하세요.'
+    title: '해지·위약 조건을 확인하세요',
+    point: '중도 해지하면 위약금이나 불이익이 클 수 있어요.',
+    action: '해지 절차와 위약금 계산 방식을 미리 확인하세요.'
+  },
+  restriction: {
+    title: '권리가 제한될 수 있어요',
+    point: '특정 조건에서 대출·이용 등 권리가 제한될 수 있어요.',
+    action: '제한 조건에 해당하는지 확인하고, 필요하면 계약 전에 문의하세요.'
   },
   action: {
-    title: '서명/날인이 필요해요',
-    desc: '직접 처리해야 할 항목이 있어요.',
-    why: '계약 효력을 위해 서명·날인처럼 직접 처리해야 할 항목이 있을 수 있어요.'
+    title: '서명·날인 전 확인하세요',
+    point: '서명하면 모든 조항에 동의한 것으로 효력이 생겨요.',
+    action: '서명 전에 특약·금액·기간을 한 번 더 확인하세요.'
   }
 };
 
@@ -115,7 +120,6 @@ const TYPE_HINTS = {
 };
 
 const CONTRACTUAL_RE = /환불|자동결제|제3자|제 3자|책임|위약금|해지|이용 제한|개인정보/;
-const NUMBERY_RE = /[0-9]/;
 
 // Map a piece of evidence text to a friendly theme key.
 function classifyTheme(text, tag) {
@@ -262,17 +266,12 @@ function pickTop(result, mode, documentText) {
         ? { ...base, ...CONTRACT_OVERRIDES[themeKey] }
         : base;
 
-      let why = theme.why;
-      if (isGood && themeKey === 'money' && !isContract && NUMBERY_RE.test(String(candidate.value || ''))) {
-        why = `${candidate.value}처럼 ${theme.why}`;
-      }
-
       items.push({
         themeKey,
         emoji: base.emoji,
         title: theme.title,
-        desc: isGood ? theme.desc : '근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.',
-        why: isGood ? why : `${theme.why} 다만 근거 텍스트가 일부 깨져 있어 원문 확인이 필요해요.`,
+        point: theme.point,
+        action: theme.action,
         cleaned: evidence.cleaned,
         raw: evidence.raw,
         quality: isGood ? 'good' : 'low'
@@ -339,8 +338,6 @@ function TopPriorities({ result, analysisMode = 'quick', documentText = '', onSh
                     <span className="top-priority-emoji" aria-hidden="true">{item.emoji}</span>
                     {item.title}
                   </span>
-                  <span className="top-priority-desc">{item.desc}</span>
-
                   {hasSentence ? (
                     <span className="top-priority-quote">“{item.cleaned}”</span>
                   ) : item.raw ? (
@@ -348,6 +345,13 @@ function TopPriorities({ result, analysisMode = 'quick', documentText = '', onSh
                   ) : (
                     <span className="top-priority-quote is-muted">관련 문장을 찾지 못했어요. 근거 탭에서 확인해 주세요.</span>
                   )}
+
+                  <span className="top-priority-why">
+                    <strong>왜 중요?</strong> {item.point}
+                  </span>
+                  <span className="top-priority-tip">
+                    <strong>이렇게 하세요</strong> {item.action}
+                  </span>
                 </span>
               </div>
 
